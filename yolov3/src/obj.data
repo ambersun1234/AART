@@ -1,0 +1,5 @@
+classes=17
+train=/media/ambersun/trainingDatasets/cfg/train.txt
+valid=/media/ambersun/trainingDatasets/cfg/test.txt
+names=/media/ambersun/trainingDatasets/cfg/obj.names
+backup=/media/ambersun/trainingDatasets/weights/
