@@ -1,0 +1,4 @@
+__pycache__
+venv
+.idea
+yolov3/weights/*.weights
