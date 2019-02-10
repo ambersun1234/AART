@@ -1,7 +1,6 @@
 from darknet import *
 import cv2
 
-
 def convertBack( x , y , w , h ) :
 	xmin = int( round( x - ( w / 2 ) ) )
 	xmax = int( round( x + ( w / 2 ) ) )
