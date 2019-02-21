@@ -1,4 +1,6 @@
-__pycache__
-venv
-.idea
 yolov3/weights/*.weights
+yolov3/input
+yolov3/config.py
+yolov3/venv
+yolov3/__pycache__
+yolov3/.idea
