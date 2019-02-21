@@ -9,6 +9,7 @@ from config import *
 # 導入各自機器的檔案路徑
 
 sys.path.append('/usr/local/python/openpose')
+
 config()
 
 try:
