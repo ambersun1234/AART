@@ -42,13 +42,11 @@ def convertBack(x, y, w, h):
 
 
 if __name__ == '__main__':
-    capture = cv2.VideoCapture('./video.mp4')
-
     net = load_net( darknetCfg.encode( 'utf-8' ) ,
                     darnetWeights.encode( 'utf-8' ) , 0)
     meta = load_meta( darknetData.encode( 'utf-8' ) )
 
-    capture = cv2.VideoCapture("video.mp4")
+    capture = cv2.VideoCapture('./input/original.mp4')
     fourcc = cv2.VideoWriter_fourcc('D', 'I', 'V', 'X')
 
     saving = cv2.VideoWriter("out.mp4", fourcc, 30.0, (
