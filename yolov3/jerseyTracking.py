@@ -3,8 +3,13 @@ import cv2
 import sys
 import openposeMy
 import time
+import os
+
+from config import *
+# 導入各自機器的檔案路徑
 
 sys.path.append('/usr/local/python/openpose')
+config()
 
 try:
     from openpose import *
@@ -23,7 +28,7 @@ params["scale_number"] = 1
 params["render_threshold"] = 0.05
 params["num_gpu_start"] = 0
 params["disable_blending"] = False
-params["default_model_folder"] = "/home/ambersun/library/openpose/models/"
+params["default_model_folder"] = defaultModelFolder
 openpose = OpenPose(params)
 
 
@@ -38,9 +43,9 @@ def convertBack(x, y, w, h):
 if __name__ == '__main__':
     capture = cv2.VideoCapture('./video.mp4')
 
-    net = load_net(b"./yolov3.cfg",
-                   b"./yolov3_20000.weights", 0)
-    meta = load_meta(b"./obj.data")
+    net = load_net( darknetCfg.encode( 'utf-8' ) ,
+                    darnetWeights.encode( 'utf-8' ) , 0)
+    meta = load_meta( darknetData.encode( 'utf-8' ) )
 
     capture = cv2.VideoCapture("video.mp4")
     fourcc = cv2.VideoWriter_fourcc('D', 'I', 'V', 'X')

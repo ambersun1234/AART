@@ -3,7 +3,10 @@ import math
 import random
 import numpy as np
 
-myHomeDir = "/media/ambersun/gitRepo/darknet/"
+from config import *
+# 導入各自機器的檔案路徑
+
+myHomeDir = darknetDir
 
 
 def sample( probs ) :

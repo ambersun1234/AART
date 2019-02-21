@@ -1,0 +1,5 @@
+classes=22
+train="/meida/ambersun/gitRepo/src/train.txt"
+valid="/meida/ambersun/gitRepo/src/test.txt"
+names="/media/ambersun/gitRepo/src/obj.names"
+backup="/media/ambersun/gitRepo/weights/"
