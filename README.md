@@ -19,6 +19,9 @@ git clone git@github.com:ambersun1234/AART.git
 
 ```
 
+### Commit hooks
++ This github repository had installed **pre-commit hook** and **commit-msg hook**, please install *pycodestyle* by `sudo pip3 install pycodestyle`. Enable commit hooks by `make`, it will show something like `Git commit hooks are installed successfully.`
+
 ### Author
 + [ambersun1234](https://github.com/ambersun1234)
 + [louisme87](https://github.com/louisme87)
