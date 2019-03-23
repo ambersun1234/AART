@@ -20,7 +20,14 @@ git clone git@github.com:ambersun1234/AART.git
 ```
 
 ### Commit hooks
-+ This github repository had installed **pre-commit hook** and **commit-msg hook**, please install *pycodestyle* by `sudo pip3 install pycodestyle`. Enable commit hooks by `make`, it will show something like `Git commit hooks are installed successfully.`
++ This github repository had installed **pre-commit hook** and **commit-msg hook**, please install *pycodestyle* by `sudo pip3 install pycodestyle`. And install *autopep8* by `sudo pip3 install --upgrade autopep8`. Enable commit hooks by `make`, it will show something like `Git commit hooks are installed successfully.`
+
+### Format code
++ Once you installed Commit hooks, format each python code by *autopep8*
+usage:
+```=1
+autopep8 --in-place --global-config ~/.config/pep8 AART_project/src/main.py
+```
 
 ### Author
 + [ambersun1234](https://github.com/ambersun1234)
