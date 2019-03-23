@@ -7,12 +7,11 @@ for i in "${byid[@]}"
 		if [[ "${i}" = "." ]] || [[ "${i}" = ".." ]]; then
 			continue
 		fi
-		first=$(echo ${i} | awk -F '->' '{print $1}')
+		first=$(echo ${i} | awk -F ' ->' '{print $1}')
 		temp=$(echo ${first} | cut -d "-" -f2- | cut -d "_" -f-2 | tr "_" ":")
 		temp2=$(echo ${first} | rev | cut -d "-" -f1 | rev | sed 's/[a-z]//g')
 		id+="${temp}_${temp2}"
 	done
 
-echo "${id[@]}"
-echo "seperate"
-echo "${usb[@]}"
+IFS='|'
+echo -n "${id[*]}@${usb[*]}"

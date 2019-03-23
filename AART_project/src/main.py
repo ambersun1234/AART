@@ -1,7 +1,9 @@
 import wx
 import wx.media
-import os
-import subprocess
+
+import cv2
+
+from src.device.device import SelectDeviceDialog
 
 class StaticText(wx.StaticText):
 	"""
@@ -10,7 +12,6 @@ class StaticText(wx.StaticText):
 	updated very frequently otherwise.
 	"""
 	def SetLabel(self, label):
-
 		if label != self.GetLabel():
 			wx.StaticText.SetLabel(self, label)
 
@@ -106,62 +107,6 @@ class Panel(wx.Panel):
 		self.timer.Stop()
 		del self.timer
 
-class PopupWindow(wx.PopupWindow):
-	def __init__(self, parent):
-		wx.PopupWindow.__init__(self, parent)
-		panel = wx.Panel(self)
-		self.panel = panel
-		panel.SetBackgroundColour("CADET BLUE")
-
-		st = wx.StaticText(panel, -1,
-							"This is a special kind of top level\n"
-							"window that can be used for\n"
-							"popup menus, combobox popups\n"
-							"and such.\n\n"
-							"Try positioning the demo near\n"
-							"the bottom of the screen and \n"
-							"hit the button again.\n\n"
-							"In this demo this window can\n"
-							"be dragged with the left button\n"
-							"and closed with the right."
-							,
-							pos=(10,10))
-		sz = st.GetBestSize()
-		self.SetSize( (sz.width+20, sz.height+20) )
-		panel.SetSize( (sz.width+20, sz.height+20) )
-
-		panel.Bind(wx.EVT_LEFT_DOWN, self.OnMouseLeftDown)
-		panel.Bind(wx.EVT_MOTION, self.OnMouseMotion)
-		panel.Bind(wx.EVT_LEFT_UP, self.OnMouseLeftUp)
-		panel.Bind(wx.EVT_RIGHT_UP, self.OnRightUp)
-
-		st.Bind(wx.EVT_LEFT_DOWN, self.OnMouseLeftDown)
-		st.Bind(wx.EVT_MOTION, self.OnMouseMotion)
-		st.Bind(wx.EVT_LEFT_UP, self.OnMouseLeftUp)
-		st.Bind(wx.EVT_RIGHT_UP, self.OnRightUp)
-
-		wx.CallAfter(self.Refresh)
-
-	def OnMouseLeftDown(self, evt):
-		self.Refresh()
-		self.ldPos = evt.GetEventObject().ClientToScreen(evt.GetPosition())
-		self.wPos = self.ClientToScreen((0,0))
-		self.panel.CaptureMouse()
-
-	def OnMouseMotion(self, evt):
-		if evt.Dragging() and evt.LeftIsDown():
-			dPos = evt.GetEventObject().ClientToScreen(evt.GetPosition())
-			nPos = (self.wPos.x + (dPos.x - self.ldPos.x),
-					self.wPos.y + (dPos.y - self.ldPos.y))
-			self.Move(nPos)
-
-	def OnMouseLeftUp(self, evt):
-		if self.panel.HasCapture():
-			self.panel.ReleaseMouse()
-
-	def OnRightUp(self, evt):
-		self.Show(False)
-		self.Destroy()
 
 class Frame(wx.Frame):
 	def __init__(self, parent, title):
@@ -183,33 +128,28 @@ class Frame(wx.Frame):
 
 	def initMenuBar(self):
 		menuBar = wx.MenuBar()
+		menuBar.SetFont(wx.Font(13, wx.FONTFAMILY_DEFAULT,wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL))
 		fileMenu = wx.Menu()
 
-		fileMenu.Append(wx.ID_NEW, "&New", "New file")
 		op = wx.Menu()
 		op.Append(11, "&Select camera\tCtrl+c", "Select camera")
 		op.Append(wx.ID_OPEN, "&Select Video", "Select video")
 		fileMenu.Append(wx.ID_ANY, "&Open", op)
-		fileMenu.Append(wx.ID_SAVE, "&Save", "Save file")
-		fileMenu.Append(wx.ID_SAVEAS, "&Save as", "Save file as")
 		fileMenu.Append(wx.ID_EXIT, "&Quit", "Quit application")
 
 		menuBar.Append(fileMenu, "&File")
 		self.SetMenuBar(menuBar)
 
 		self.Bind(wx.EVT_MENU, self.OnQuit, id=wx.ID_EXIT)
-		self.Bind(wx.EVT_MENU, self.onOpen, id=wx.ID_OPEN)
-		self.Bind(wx.EVT_MENU, self.onSelect, id=11)
+		self.Bind(wx.EVT_MENU, self.onOpenVideo, id=wx.ID_OPEN)
+		self.Bind(wx.EVT_MENU, self.onSelectCamera, id=11)
 
-	def onSelect(self, event):
-		# fetch video id
-		p = subprocess.Popen("./fetch.sh", shell=True, executable='/bin/bash', stdout=subprocess.PIPE)
-		for element in p.stdout.readlines():
-			print( element )
-		temp = PopupWindow(self.GetTopLevelParent())
-		temp.Show()
+	def onSelectCamera(self, event):
+		dialog = SelectDeviceDialog(None, title="Select web camera")
+		dialog.ShowModal()
+		dialog.Destroy()
 
-	def onOpen(self, event):
+	def onOpenVideo(self, event):
 		dialog = wx.FileDialog(self, message="Choose a file", wildcard="*.mp4", defaultFile="", style=wx.FD_OPEN | wx.FD_MULTIPLE | wx.FD_CHANGE_DIR)
 		if dialog.ShowModal() == wx.ID_OK:
 			paths = dialog.GetPaths()
