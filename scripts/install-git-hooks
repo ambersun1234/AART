@@ -13,5 +13,7 @@ chmod +x .git/hooks/commit-msg
 
 touch .git/hooks/applied || exit 1
 
+cp ../pep8 ~/.config/pep8
+
 echo
 echo "Git commit hooks are installed successfully."
