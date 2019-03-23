@@ -11,6 +11,7 @@ class StaticText(wx.StaticText):
 	help reduce potential flicker since these controls would be
 	updated very frequently otherwise.
 	"""
+
 	def SetLabel(self, label):
 		if label != self.GetLabel():
 			wx.StaticText.SetLabel(self, label)
@@ -37,20 +38,20 @@ class Panel(wx.Panel):
 		self.Bind(wx.EVT_BUTTON, self.OnStop, btn4)
 
 		slider = wx.Slider(self, -1, 0, 0, 0)
-		self.slider=slider
-		self.st_size=StaticText(self, -1, size=(100, -1))
-		self.st_len= StaticText(self, -1, size=(100, -1))
-		self.st_pos=StaticText(self, -1, size=(100, -1))
+		self.slider = slider
+		self.st_size = StaticText(self, -1, size=(100, -1))
+		self.st_len = StaticText(self, -1, size=(100, -1))
+		self.st_pos = StaticText(self, -1, size=(100, -1))
 
 		sizer = wx.GridBagSizer(5, 5)
-		sizer.Add(self.mc, (1, 1), span=(5, 1))#, flag=wx.EXPAND)
+		sizer.Add(self.mc, (1, 1), span=(5, 1))  # , flag=wx.EXPAND)
 		sizer.Add(btn2, (2, 3))
 		sizer.Add(btn3, (3, 3))
 		sizer.Add(btn4, (4, 3))
 		sizer.Add(slider, (6, 1), flag=wx.EXPAND)
 		sizer.Add(self.st_size, (1, 5))
-		sizer.Add(self.st_len,  (2, 5))
-		sizer.Add(self.st_pos,  (3, 5))
+		sizer.Add(self.st_len, (2, 5))
+		sizer.Add(self.st_pos, (3, 5))
 		self.SetSizer(sizer)
 
 		self.timer = wx.Timer(self)
@@ -62,23 +63,21 @@ class Panel(wx.Panel):
 
 		if not self.mc.Load(path):
 			wx.MessageBox("Unable to load %s: Unsupported format?" % path,
-						  "ERROR",
-						  wx.ICON_ERROR | wx.OK)
+                            "ERROR",
+                            wx.ICON_ERROR | wx.OK)
 		else:
 			self.mc.SetInitialSize()
 			self.GetSizer().Layout()
 			self.slider.SetRange(0, self.mc.Length())
 
-
 	def OnMediaLoaded(self, evt):
 		self.playBtn.Enable()
-
 
 	def OnPlay(self, evt):
 		if not self.mc.Play():
 			wx.MessageBox("Unable to Play media : Unsupported format?",
-						  "ERROR",
-						  wx.ICON_ERROR | wx.OK)
+                            "ERROR",
+                            wx.ICON_ERROR | wx.OK)
 		else:
 			self.mc.SetInitialSize()
 			self.GetSizer().Layout()
@@ -86,7 +85,6 @@ class Panel(wx.Panel):
 
 	def OnPause(self, evt):
 		self.mc.Pause()
-
 
 	def OnStop(self, evt):
 		self.mc.Stop()
@@ -99,9 +97,8 @@ class Panel(wx.Panel):
 		offset = self.mc.Tell()
 		self.slider.SetValue(offset)
 		self.st_size.SetLabel('size: %s' % self.mc.GetBestSize())
-		self.st_len.SetLabel('length: %d seconds' % (self.mc.Length()/1000))
+		self.st_len.SetLabel('length: %d seconds' % (self.mc.Length() / 1000))
 		self.st_pos.SetLabel('position: %d' % offset)
-
 
 	def ShutdownDemo(self):
 		self.timer.Stop()
@@ -119,16 +116,16 @@ class Frame(wx.Frame):
 		self.Show()
 
 	def initSize(self):
-		screenX, screenY=wx.GetDisplaySize()
+		screenX, screenY = wx.GetDisplaySize()
 		screenX = screenX * 0.75
 		screenY = screenY * 0.8
 
-		self.SetSize(screenX,screenY)
+		self.SetSize(screenX, screenY)
 		self.Centre()
 
 	def initMenuBar(self):
 		menuBar = wx.MenuBar()
-		menuBar.SetFont(wx.Font(13, wx.FONTFAMILY_DEFAULT,wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL))
+		menuBar.SetFont(wx.Font(13, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL))
 		fileMenu = wx.Menu()
 
 		op = wx.Menu()

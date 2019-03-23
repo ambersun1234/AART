@@ -26,8 +26,8 @@ class SelectDeviceDialog(wx.Dialog):
 		hbox.Add(closeButton, flag=wx.LEFT, border=5)
 
 		vbox.Add(pnl, proportion=1,
-				 flag=wx.ALL|wx.EXPAND, border=5)
-		vbox.Add(hbox, flag=wx.ALIGN_CENTER|wx.TOP|wx.BOTTOM, border=10)
+                    flag=wx.ALL | wx.EXPAND, border=5)
+		vbox.Add(hbox, flag=wx.ALIGN_CENTER | wx.TOP | wx.BOTTOM, border=10)
 
 		self.SetSizer(vbox)
 		self.Bind(wx.EVT_RADIOBUTTON, self.onSelect)
@@ -46,7 +46,7 @@ class DeviceCheck:
 	@staticmethod
 	def deviceQuery():
 		subprocess.call(["chmod +x ./fetch.sh"], shell=True)
-		p = subprocess.Popen( "./fetch.sh", shell=True, stdout=subprocess.PIPE, executable="/bin/bash")
+		p = subprocess.Popen("./fetch.sh", shell=True, stdout=subprocess.PIPE, executable="/bin/bash")
 		output, err = p.communicate()
 		errorcode = p.returncode
 
