@@ -10,7 +10,7 @@ import tempfile
 
 # don't fill in both of these
 select_codes = []
-ignore_codes = ["E114","E133","E302","E305","E731","W191"]
+ignore_codes = ["E114","E117","E133","E302","E305","E731","W191"]
 # For more rules please visit https://lintlyci.github.io/Flake8Rules/
 # Add things like "--max-line-length=120" below
 overrides = []
