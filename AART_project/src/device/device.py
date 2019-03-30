@@ -1,6 +1,8 @@
 import wx
 import subprocess
 
+from src.media.media import previewCamera
+
 class SelectDeviceDialog(wx.Dialog):
 	def __init__(self, *args, **kwargs):
 		super(SelectDeviceDialog, self).__init__(*args, **kwargs)
@@ -8,43 +10,69 @@ class SelectDeviceDialog(wx.Dialog):
 		self.deviceID_t = -1
 		self.deviceID = -1
 		self.device = DeviceCheck.deviceQuery()
+
+		self.showPnl = previewCamera(self, 0)
+
 		self.InitUI()
+		self.initSize()
+
+	def initSize(self):
+		sx, sy = wx.GetDisplaySize()
+		sx = sx * 0.22
+		sy = sy * 0.35
+		self.SetSize(sx, sy)
 
 	def InitUI(self):
 		pnl = wx.Panel(self)
+
+		# boxsizer declaration
 		vbox = wx.BoxSizer(wx.VERTICAL)
+		hbox = wx.BoxSizer(wx.HORIZONTAL)
 
-		sb = wx.StaticBox(pnl, label='Select web cameras')
-		sbs = wx.StaticBoxSizer(sb, orient=wx.VERTICAL)
+		sbs = wx.StaticBoxSizer(
+			wx.StaticBox(
+				pnl,
+				label='Select web cameras'
+			),
+			orient=wx.VERTICAL
+		)
 
+		# add valid web camera to wx.RadioButton
 		for key, value in self.device.items():
 			temp = wx.RadioButton(pnl, label=key)
 			sbs.Add(temp)
 
-		hbox = wx.BoxSizer(wx.HORIZONTAL)
 		okButton = wx.Button(self, label='Ok')
 		closeButton = wx.Button(self, label='Close')
+
 		hbox.Add(okButton)
-		hbox.Add(closeButton, flag=wx.LEFT, border=5)
+		hbox.Add(closeButton, flag=wx.LEFT, border=1)
 
 		vbox.Add(
 			pnl,
 			proportion=1,
-			flag=wx.ALL | wx.EXPAND,
-			border=5
+			flag=wx.ALL | wx.EXPAND | wx.ALIGN_CENTER,
+			border=1
 		)
-		vbox.Add(hbox, flag=wx.ALIGN_CENTER | wx.TOP | wx.BOTTOM)
+		vbox.Add(self.showPnl, proportion=5, flag=wx.ALL | wx.EXPAND, border=1)
+		vbox.Add(hbox, flag=wx.ALIGN_CENTER | wx.TOP | wx.BOTTOM, border=1)
 
 		pnl.SetSizer(sbs)
 		self.SetSizer(vbox)
-		self.Bind(wx.EVT_RADIOBUTTON, self.onSelect)
+		self.Bind(
+			wx.EVT_RADIOBUTTON,
+			lambda event, temp=self.showPnl: self.onSelect(event, temp)
+		)
 
+		# event biding
 		okButton.Bind(wx.EVT_RADIOBUTTON, self.onOk)
 		closeButton.Bind(wx.EVT_BUTTON, self.onClose)
+		self.Show()
 
-	def onSelect(self, event):
+	def onSelect(self, event, pnl):
 		self.deviceID_t = int(self.device[event.GetEventObject().GetLabel()])
-		print(self.deviceID_t)
+		# passing device id temp to showPnl for update
+		self.showPnl.deviceIDT = self.deviceID_t
 
 	def onOk(self):
 		self.deviceID = self.deviceID_t

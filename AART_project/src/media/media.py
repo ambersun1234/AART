@@ -1,5 +1,51 @@
 import wx
 import wx.media
+import cv2
+
+class previewCamera(wx.Panel):
+	def __init__(self, parent, deviceID):
+		wx.Panel.__init__(self, parent)
+
+		self.deviceIDT = deviceID
+		self.deviceID = deviceID
+		self.fps = 20
+		self.timer = wx.Timer(self)
+		self.timer.Start(1000. / self.fps)
+
+		self.capture = cv2.VideoCapture(self.deviceID)
+		ret, self.defaultFrame = self.capture.read()
+
+		self.defaultFrame = cv2.cvtColor(self.defaultFrame, cv2.COLOR_BGR2RGB)
+
+		self.bmp = wx.Bitmap.FromBuffer(
+			self.capture.get(cv2.CAP_PROP_FRAME_WIDTH),
+			self.capture.get(cv2.CAP_PROP_FRAME_HEIGHT),
+			self.defaultFrame
+		)
+
+		self.Bind(wx.EVT_PAINT, self.onPaint)
+		self.Bind(wx.EVT_TIMER, self.getNext)
+
+		self.Show()
+
+	def onChangeCapture(self):
+		if self.deviceIDT != self.deviceID:
+			self.deviceID = self.deviceIDT
+			self.capture = cv2.VideoCapture(self.deviceID)
+
+	def onPaint(self, event):
+		dc = wx.BufferedPaintDC(self)
+		dc.DrawBitmap(self.bmp, 0, 0)
+
+	def getNext(self, event):
+		self.onChangeCapture()
+		ret, frame = self.capture.read()
+
+		if ret:
+			frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+			# frame = cv2.resize(frame, (300, 300), interpolation=cv2.INTER_CUBIC)
+			self.bmp.CopyFromBuffer(frame)
+			self.Refresh()
 
 class StaticText(wx.StaticText):
 	"""
