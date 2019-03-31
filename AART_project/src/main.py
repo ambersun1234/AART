@@ -1,8 +1,6 @@
 import wx
 import wx.media
 
-import cv2
-
 from src.device.device import SelectDeviceDialog
 from src.input.input import InputPanel
 from src.media.media import MediaPanel
@@ -69,8 +67,19 @@ class Frame(wx.Frame):
 		self.SetSizer(vbox)
 		self.Show()
 
+	def getMinResolution(self):
+		rx = 7680
+		ry = 4320
+		# get all displays
+		displays = (wx.Display(i) for i in range(wx.Display.GetCount()))
+		for display in displays:
+			tx, ty = display.GetGeometry().GetSize()
+			rx = tx if tx < rx else rx
+			ry = ty if ty < ry else ry
+		return rx, ry
+
 	def initSize(self):
-		screenX, screenY = wx.GetDisplaySize()
+		screenX, screenY = self.getMinResolution()
 		self.currentScreenX = screenX * 0.75
 		self.currentScreenY = screenY * 0.8
 

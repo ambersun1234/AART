@@ -19,8 +19,19 @@ class SelectDeviceDialog(wx.Dialog):
 		else:
 			self.initNoDeviceUI()
 
+	def getMinResolution(self):
+		rx = 7680
+		ry = 4320
+		# get all displays
+		displays = (wx.Display(i) for i in range(wx.Display.GetCount()))
+		for display in displays:
+			tx, ty = display.GetGeometry().GetSize()
+			rx = tx if tx < rx else rx
+			ry = ty if ty < ry else ry
+		return rx, ry
+
 	def initSize(self):
-		sx, sy = wx.GetDisplaySize()
+		sx, sy = self.getMinResolution()
 		sx = sx * 0.22
 		sy = sy * 0.35
 		self.SetSize(sx, sy)
@@ -102,7 +113,7 @@ class SelectDeviceDialog(wx.Dialog):
 		)
 
 		# event biding
-		okButton.Bind(wx.EVT_RADIOBUTTON, self.onOk)
+		okButton.Bind(wx.EVT_BUTTON, self.onOk)
 		closeButton.Bind(wx.EVT_BUTTON, self.onClose)
 		self.Show()
 
@@ -113,7 +124,7 @@ class SelectDeviceDialog(wx.Dialog):
 
 	def onOk(self, event):
 		self.deviceID = self.deviceID_t
-		self.onClose()
+		self.onClose(event)
 
 	def onClose(self, event):
 		self.Destroy()
