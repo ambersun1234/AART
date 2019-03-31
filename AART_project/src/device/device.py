@@ -9,12 +9,15 @@ class SelectDeviceDialog(wx.Dialog):
 
 		self.deviceID_t = -1
 		self.deviceID = -1
-		self.device = DeviceCheck.deviceQuery()
+		self.deviceCheck, self.device = DeviceCheck.deviceQuery()
 
-		self.showPnl = previewCamera(self, 0)
-
-		self.InitUI()
-		self.initSize()
+		# no available web camera device found on current pc
+		if self.deviceCheck:
+			self.showPnl = previewCamera(self, 0)
+			self.InitDeviceUI()
+			self.initSize()
+		else:
+			self.initNoDeviceUI()
 
 	def initSize(self):
 		sx, sy = wx.GetDisplaySize()
@@ -22,7 +25,41 @@ class SelectDeviceDialog(wx.Dialog):
 		sy = sy * 0.35
 		self.SetSize(sx, sy)
 
-	def InitUI(self):
+	def initNoDeviceUI(self):
+		pnl = wx.Panel(self)
+
+		vbox = wx.BoxSizer(wx.VERTICAL)
+
+		sbs = wx.StaticBoxSizer(
+			wx.StaticBox(
+				pnl,
+				label='Select web cameras'
+			),
+			orient=wx.VERTICAL
+		)
+		sbs.Add(
+			wx.StaticText(
+				self,
+				label="No available web camera device on current pc",
+				style=wx.ALIGN_CENTER | wx.CENTER
+			)
+		)
+		closeButton = wx.Button(self, label='Ok')
+
+		vbox.Add(
+			pnl,
+			proportion=1,
+			flag=wx.ALL | wx.EXPAND | wx.ALIGN_CENTER,
+			border=1,
+		)
+		vbox.Add(closeButton, flag=wx.ALIGN_CENTER | wx.TOP | wx.BOTTOM, border=1)
+
+		pnl.SetSizer(sbs)
+		self.SetSizer(vbox)
+		closeButton.Bind(wx.EVT_BUTTON, self.onClose)
+		self.Show()
+
+	def InitDeviceUI(self):
 		pnl = wx.Panel(self)
 
 		# boxsizer declaration
@@ -74,8 +111,9 @@ class SelectDeviceDialog(wx.Dialog):
 		# passing device id temp to showPnl for update
 		self.showPnl.deviceIDT = self.deviceID_t
 
-	def onOk(self):
+	def onOk(self, event):
 		self.deviceID = self.deviceID_t
+		self.onClose()
 
 	def onClose(self, event):
 		self.Destroy()
@@ -118,45 +156,65 @@ class DeviceCheck:
 		return usbs
 
 	@staticmethod
-	def deviceQuery():
-		subprocess.call(["chmod +x ./fetch.sh"], shell=True)
+	def checkV4l():
 		p = subprocess.Popen(
-			"./fetch.sh",
+			"ls -al /dev/ | grep v4l",
 			shell=True,
-			stdout=subprocess.PIPE,
-			executable="/bin/bash"
+			stdout=subprocess.PIPE
 		)
-		output, err = p.communicate()
-		errorcode = p.returncode
+		out, err = p.communicate()
 
-		if errorcode == 0:
-			output = str(output)[2:-1]
-			idt, usbt = output.split("@")
-			ids, repeatMapping, repeatMappingCount = DeviceCheck.getId(idt)
-			usbs = DeviceCheck.getUsb(usbt)
-			devices = dict()
+		# out will be bytes literal, thus in comparison need to use decode
+		return True if not out.decode() == "" else False
 
-			# id name mapping
-			for id, index in ids.items():
-				if ":" in id:
-					twoId = "{}:{}".format(str(id).split(":")[0], str(id).split(":")[1])
+	@staticmethod
+	def deviceQuery():
+		retDeviceCheck = False
+		retDevice = dict()
 
-					if twoId in usbs:
-						if repeatMapping[twoId] <= 1:
-							devices["{}".format(usbs[twoId])] = index
-						else:
-							devices["{} [ {} ]".format(
-								usbs[twoId],
-								repeatMappingCount[twoId] + 1
-							)] = index
-						repeatMappingCount[twoId] += 1
-				else:
-					if id in usbs:
-						devices[usbs[id]] = index
+		if not DeviceCheck.checkV4l():
+			pass
+		else:
+			subprocess.call(["chmod +x ./fetch.sh"], shell=True)
+			p = subprocess.Popen(
+				"./fetch.sh",
+				shell=True,
+				stdout=subprocess.PIPE,
+				executable="/bin/bash"
+			)
+			output, err = p.communicate()
+			errorcode = p.returncode
 
-			diff = set(ids.values()) - set(devices.values())
-			if len(diff) != 0:
-				id = diff.pop()
-				devices["Build in web camera"] = id
+			if errorcode == 0:
+				output = str(output)[2:-1]
+				idt, usbt = output.split("@")
+				ids, repeatMapping, repeatMappingCount = DeviceCheck.getId(idt)
+				usbs = DeviceCheck.getUsb(usbt)
+				devices = dict()
 
-		return {k: v for k, v in sorted(devices.items(), key=lambda x: x[1])}
+				# id name mapping
+				for id, index in ids.items():
+					if ":" in id:
+						twoId = "{}:{}".format(str(id).split(":")[0], str(id).split(":")[1])
+
+						if twoId in usbs:
+							if repeatMapping[twoId] <= 1:
+								devices["{}".format(usbs[twoId])] = index
+							else:
+								devices["{} [ {} ]".format(
+									usbs[twoId],
+									repeatMappingCount[twoId] + 1
+								)] = index
+							repeatMappingCount[twoId] += 1
+					else:
+						if id in usbs:
+							devices[usbs[id]] = index
+
+				diff = set(ids.values()) - set(devices.values())
+				if len(diff) != 0:
+					id = diff.pop()
+					devices["Build in web camera"] = id
+			retDeviceCheck = True
+			retDevice = devices
+
+		return retDeviceCheck, retDevice
