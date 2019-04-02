@@ -1,7 +1,7 @@
 import wx
 import subprocess
 
-from src.media.media import previewCamera, MediaPanel
+from src.media.media import previewCamera
 
 class SelectDeviceDialog(wx.Dialog):
 	def __init__(self, *args, **kwargs):
@@ -13,7 +13,7 @@ class SelectDeviceDialog(wx.Dialog):
 
 		# no available web camera device found on current pc
 		if self.deviceCheck:
-			self.showPnl = previewCamera(self, 0)
+			self.preview = previewCamera(self, 0)
 			self.InitDeviceUI()
 			self.initSize()
 		else:
@@ -89,7 +89,6 @@ class SelectDeviceDialog(wx.Dialog):
 		count = 0
 		for key, value in self.device.items():
 			if count == 0:
-				self.deviceID = (int)(value)
 				self.deviceID_t = (int)(value)
 			temp = wx.RadioButton(pnl, label=key)
 			sbs.Add(temp)
@@ -107,14 +106,14 @@ class SelectDeviceDialog(wx.Dialog):
 			flag=wx.ALL | wx.EXPAND | wx.ALIGN_CENTER,
 			border=1
 		)
-		vbox.Add(self.showPnl, proportion=5, flag=wx.ALL | wx.EXPAND, border=1)
+		vbox.Add(self.preview, proportion=5, flag=wx.ALL | wx.EXPAND, border=1)
 		vbox.Add(hbox, flag=wx.ALIGN_CENTER | wx.TOP | wx.BOTTOM, border=1)
 
 		pnl.SetSizer(sbs)
 		self.SetSizer(vbox)
 		self.Bind(
 			wx.EVT_RADIOBUTTON,
-			lambda event, temp=self.showPnl: self.onSelect(event, temp)
+			lambda event, temp=self.preview: self.onSelect(event, temp)
 		)
 
 		# event biding
@@ -124,15 +123,16 @@ class SelectDeviceDialog(wx.Dialog):
 
 	def onSelect(self, event, pnl):
 		self.deviceID_t = int(self.device[event.GetEventObject().GetLabel()])
-		# passing device id temp to showPnl for update
-		self.showPnl.deviceIDT = self.deviceID_t
+		# passing device id temp to preview for update
+		self.preview.deviceIDT = self.deviceID_t
 
 	def onOk(self, event):
 		self.deviceID = self.deviceID_t
-		self.showPnl.capture.release()
+		self.preview.capture.release()
 		self.onClose(event)
 
 	def onClose(self, event):
+		self.preview.capture.release()
 		self.Destroy()
 
 class DeviceCheck:

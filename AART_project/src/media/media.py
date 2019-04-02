@@ -116,14 +116,13 @@ class MediaPanel(wx.Panel):
 			# start stream
 			self.timer.Start(1000. / self.fps)
 
-			print(type(frame))
-
 	def doLoad(self, path):
 		self.videoPath = path
 		self.choice = self.type["video"]
 		self.iterate()
 
 	def doSelect(self, id):
-		self.captureID = id
-		self.choice = self.type["webcam"]
-		self.iterate()
+		if not id == -1:
+			self.captureID = id
+			self.choice = self.type["webcam"]
+			self.iterate()
