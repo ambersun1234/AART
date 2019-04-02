@@ -83,6 +83,9 @@ class Frame(wx.Frame):
 		self.currentScreenX = screenX * 0.75
 		self.currentScreenY = screenY * 0.8
 
+		# self.currentScreenX = screenX
+		# self.currentScreenY = screenY
+
 		self.SetSize(self.currentScreenX, self.currentScreenY)
 		self.Centre()
 
@@ -112,6 +115,7 @@ class Frame(wx.Frame):
 	def onSelectCamera(self, event):
 		dialog = SelectDeviceDialog(None, title="Select web camera")
 		dialog.ShowModal()
+		self.mediaPanel.doSelect((int)(dialog.deviceID))
 		dialog.Destroy()
 
 	def onOpenVideo(self, event):
@@ -125,7 +129,7 @@ class Frame(wx.Frame):
 		if dialog.ShowModal() == wx.ID_OK:
 			paths = dialog.GetPaths()
 			for path in paths:
-				MediaPanel.DoLoadFile(self.mediaPanel, path)
+				self.mediaPanel.doLoad(path)
 		dialog.Destroy()
 
 	def OnQuit(self, event):

@@ -1,7 +1,7 @@
 import wx
 import subprocess
 
-from src.media.media import previewCamera
+from src.media.media import previewCamera, MediaPanel
 
 class SelectDeviceDialog(wx.Dialog):
 	def __init__(self, *args, **kwargs):
@@ -86,9 +86,14 @@ class SelectDeviceDialog(wx.Dialog):
 		)
 
 		# add valid web camera to wx.RadioButton
+		count = 0
 		for key, value in self.device.items():
+			if count == 0:
+				self.deviceID = (int)(value)
+				self.deviceID_t = (int)(value)
 			temp = wx.RadioButton(pnl, label=key)
 			sbs.Add(temp)
+			count += 1
 
 		okButton = wx.Button(self, label='Ok')
 		closeButton = wx.Button(self, label='Close')
@@ -124,6 +129,7 @@ class SelectDeviceDialog(wx.Dialog):
 
 	def onOk(self, event):
 		self.deviceID = self.deviceID_t
+		self.showPnl.capture.release()
 		self.onClose(event)
 
 	def onClose(self, event):
