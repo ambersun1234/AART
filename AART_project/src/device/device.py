@@ -1,6 +1,8 @@
 import wx
 import subprocess
 
+import os
+
 from src.media.media import previewCamera
 
 class SelectDeviceDialog(wx.Dialog):
@@ -189,12 +191,14 @@ class DeviceCheck:
 		retDeviceCheck = False
 		retDevice = dict()
 
+		path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 		if not DeviceCheck.checkV4l():
 			pass
 		else:
-			subprocess.call(["chmod +x ./fetch.sh"], shell=True)
+			subprocess.call(["chmod +x {}/fetch.sh".format(path)], shell=True)
 			p = subprocess.Popen(
-				"./fetch.sh",
+				"{}/fetch.sh".format(path),
 				shell=True,
 				stdout=subprocess.PIPE,
 				executable="/bin/bash"

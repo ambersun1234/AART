@@ -8,7 +8,7 @@ class previewCamera(wx.Panel):
 
 		self.deviceIDT = deviceID
 		self.deviceID = deviceID
-		self.fps = 20
+		self.fps = 30
 		self.timer = wx.Timer(self)
 		self.timer.Start(1000. / self.fps)
 
@@ -56,13 +56,20 @@ class MediaPanel(wx.Panel):
 		self.cap = None
 		self.videoPath = ""
 
+		# get current panel size
+		self.currentWidth, self.currentHeight = size
+		self.currentHeight = (int)(self.currentHeight)
+		self.currentWidth = (int)(self.currentWidth)
+
 		self.fps = 30
 		self.timer = wx.Timer(self)
 
 		self.bmp = None
 
-		self.SetBackgroundColour("gray")
+		self.initUI()
 
+	def initUI(self):
+		self.SetBackgroundColour("gray")
 		self.Show()
 
 	def onPaint(self, event):
@@ -73,6 +80,12 @@ class MediaPanel(wx.Panel):
 		ret, frame = self.cap.read()
 
 		if ret:
+			# resize to fix current window size
+			frame = cv2.resize(
+				frame,
+				(self.currentWidth, self.currentHeight),
+				interpolation=cv2.INTER_CUBIC
+			)
 			frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 			self.bmp.CopyFromBuffer(frame)
 			self.Refresh()
@@ -100,11 +113,19 @@ class MediaPanel(wx.Panel):
 		else:
 			# read first image from current selected capture
 			ret, frame = self.cap.read()
-			self.bmp = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+			# resize to fix current window size
+			self.bmp = cv2.resize(
+				frame,
+				(self.currentWidth, self.currentHeight),
+				interpolation=cv2.INTER_CUBIC
+			)
+
+			self.bmp = cv2.cvtColor(self.bmp, cv2.COLOR_BGR2RGB)
 
 			self.bmp = wx.Bitmap.FromBuffer(
-				self.cap.get(cv2.CAP_PROP_FRAME_WIDTH),
-				self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT),
+				self.currentWidth,
+				self.currentHeight,
 				self.bmp
 			)
 
