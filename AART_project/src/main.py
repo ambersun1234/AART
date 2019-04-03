@@ -1,10 +1,12 @@
 import wx
 import wx.media
+import os
 
 from src.device.device import SelectDeviceDialog
 from src.input.input import InputPanel
 from src.media.media import MediaPanel
 from src.output.output import outputTextPanel, outputPicPanel
+from src.welcome.welcome import welcomeGuide
 
 class Frame(wx.Frame):
 	def __init__(self, parent, title):
@@ -43,6 +45,13 @@ class Frame(wx.Frame):
 			)
 		)
 
+		self.welcome = welcomeGuide(
+			None,
+			title="Welcome to AART",
+			size=(self.currentScreenX * 0.5, self.currentScreenY * 0.5),
+			path=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+		)
+
 		self.initUI()
 
 	def initUI(self):
@@ -66,6 +75,8 @@ class Frame(wx.Frame):
 
 		self.SetSizer(vbox)
 		self.Show()
+
+		self.welcome.ShowModal()
 
 	def getMinResolution(self):
 		rx = 7680
