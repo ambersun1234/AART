@@ -22,6 +22,19 @@ class welcomeGuide(wx.Dialog):
 		hbox = wx.BoxSizer(wx.HORIZONTAL)
 		vbox = wx.BoxSizer(wx.VERTICAL)
 
+		w, h = self.GetSize()
+		text = wx.StaticText(self, label="Recent files", style=wx.ALIGN_CENTER)
+		text.SetForegroundColour("white")
+		text.SetBackgroundColour("#666666")
+		text.SetFont(wx.Font(
+			14,
+			family=wx.DEFAULT,
+			style=wx.NORMAL,
+			weight=wx.NORMAL)
+		)
+		text.SetMinSize((w - h - 100, 25))
+		spBox.Add(text, flag=wx.EXPAND | wx.ALL)
+
 		for i in range(1, 30):
 			spBox.Add(wx.Button(self.sp, label="lala{}".format(i)))
 
@@ -35,6 +48,7 @@ class welcomeGuide(wx.Dialog):
 		)
 		vbox.Add(hbox, flag=wx.ALL | wx.EXPAND)
 
+		# vbox.SetMinSize((w - h, h))
 		self.SetBackgroundColour("gray")
 		self.SetSizer(vbox)
 
