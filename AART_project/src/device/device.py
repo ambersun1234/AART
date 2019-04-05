@@ -6,12 +6,14 @@ import os
 from src.media.media import previewCamera
 
 class SelectDeviceDialog(wx.Dialog):
-	def __init__(self, *args, **kwargs):
+	def __init__(self, *args, config, **kwargs):
 		super(SelectDeviceDialog, self).__init__(*args, **kwargs)
 
 		self.deviceID_t = -1
 		self.deviceID = -1
 		self.deviceCheck, self.device = DeviceCheck.deviceQuery()
+		self.config = config
+		self.config.loadedConfig["fontSize"] -= 5
 
 		# no available web camera device found on current pc
 		if self.deviceCheck:
@@ -40,6 +42,12 @@ class SelectDeviceDialog(wx.Dialog):
 
 	def initNoDeviceUI(self):
 		pnl = wx.Panel(self)
+		self.SetForegroundColour(
+			"white" if self.config.loadedConfig["theme"] == "dark" else "black"
+		)
+		self.SetBackgroundColour(
+			"gray" if self.config.loadedConfig["theme"] == "dark" else "white"
+		)
 
 		vbox = wx.BoxSizer(wx.VERTICAL)
 
@@ -50,14 +58,25 @@ class SelectDeviceDialog(wx.Dialog):
 			),
 			orient=wx.VERTICAL
 		)
-		sbs.Add(
-			wx.StaticText(
-				self,
-				label="No available web camera device on current pc",
-				style=wx.ALIGN_CENTER | wx.CENTER
-			)
+		temp = wx.StaticText(
+			self,
+			label="No available web camera device on current pc",
+			style=wx.ALIGN_CENTER | wx.CENTER
 		)
+		temp.SetFont(wx.Font(
+			self.config.loadedConfig["fontSize"],
+			family=wx.DEFAULT,
+			style=wx.NORMAL,
+			weight=wx.NORMAL)
+		)
+		sbs.Add(temp)
 		closeButton = wx.Button(self, label='Ok')
+		closeButton.SetFont(wx.Font(
+			self.config.loadedConfig["fontSize"],
+			family=wx.DEFAULT,
+			style=wx.NORMAL,
+			weight=wx.NORMAL)
+		)
 
 		vbox.Add(
 			pnl,
@@ -74,6 +93,12 @@ class SelectDeviceDialog(wx.Dialog):
 
 	def InitDeviceUI(self):
 		pnl = wx.Panel(self)
+		self.SetForegroundColour(
+			"white" if self.config.loadedConfig["theme"] == "dark" else "black"
+		)
+		self.SetBackgroundColour(
+			"gray" if self.config.loadedConfig["theme"] == "dark" else "white"
+		)
 
 		# boxsizer declaration
 		vbox = wx.BoxSizer(wx.VERTICAL)
@@ -93,11 +118,29 @@ class SelectDeviceDialog(wx.Dialog):
 			if count == 0:
 				self.deviceID_t = (int)(value)
 			temp = wx.RadioButton(pnl, label=key)
+			temp.SetFont(wx.Font(
+				self.config.loadedConfig["fontSize"],
+				family=wx.DEFAULT,
+				style=wx.NORMAL,
+				weight=wx.NORMAL)
+			)
 			sbs.Add(temp)
 			count += 1
 
 		okButton = wx.Button(self, label='Ok')
 		closeButton = wx.Button(self, label='Close')
+		okButton.SetFont(wx.Font(
+			self.config.loadedConfig["fontSize"],
+			family=wx.DEFAULT,
+			style=wx.NORMAL,
+			weight=wx.NORMAL)
+		)
+		closeButton.SetFont(wx.Font(
+			self.config.loadedConfig["fontSize"],
+			family=wx.DEFAULT,
+			style=wx.NORMAL,
+			weight=wx.NORMAL)
+		)
 
 		hbox.Add(okButton)
 		hbox.Add(closeButton, flag=wx.LEFT, border=1)

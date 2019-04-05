@@ -1,7 +1,7 @@
 import wx
 
 class InputPanel(wx.Panel):
-	def __init__(self, parent, size):
+	def __init__(self, parent, size, config):
 		wx.Panel.__init__(self, parent, size=size)
 
 		self.field1 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
@@ -9,6 +9,7 @@ class InputPanel(wx.Panel):
 		self.field3 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
 		# textCtrl must contain wx.TE_PROCESS_ENTER => event: EVT_TEXT_ENTER
 
+		self.config = config
 		self.input = dict()
 		# store user input
 
@@ -21,49 +22,58 @@ class InputPanel(wx.Panel):
 		hbox2 = wx.BoxSizer(wx.HORIZONTAL)
 		hbox3 = wx.BoxSizer(wx.HORIZONTAL)
 
-		t1 = wx.StaticText(self, label="person1: ")
-		t2 = wx.StaticText(self, label="person2: ")
-		t3 = wx.StaticText(self, label="person3: ")
+		title = wx.StaticText(self, label="Athlete trace: ")
+		title.SetForegroundColour(
+			"white" if self.config.loadedConfig["theme"] == "dark" else "black"
+		)
+		title.SetFont(wx.Font(
+			self.config.loadedConfig["fontSize"],
+			family=wx.DEFAULT,
+			style=wx.NORMAL,
+			weight=wx.NORMAL)
+		)
+		titleLine = wx.StaticLine(self, style=wx.LI_HORIZONTAL)
+		vbox.AddSpacer(5)
+		vbox.Add(title)
+		vbox.AddSpacer(5)
+		vbox.Add(titleLine, flag=wx.EXPAND | wx.ALL)
+		vbox.AddSpacer(5)
 
-		for element in [t1, t2, t3]:
-			element.SetForegroundColour((255, 255, 255))
+		sta = list()
+		for index in range(1, 4):
+			sta.append(wx.StaticText(self, label="person{}: ".format(index)))
+
+		for element in sta:
+			element.SetForegroundColour(
+				"white" if self.config.loadedConfig["theme"] == "dark" else "black"
+			)
 			element.SetFont(wx.Font(
-				14,
+				self.config.loadedConfig["fontSize"],
 				family=wx.DEFAULT,
 				style=wx.NORMAL,
 				weight=wx.NORMAL
 			))
 
-		hbox1.Add(t1, border=5)
-		hbox2.Add(t2, border=5)
-		hbox3.Add(t3, border=5)
+		for item, box, field in zip(
+			sta, [hbox1, hbox2, hbox3],
+			[self.field1, self.field2, self.field3]):
+			box.Add(item, border=5)
+			box.Add(field, border=5, flag=wx.EXPAND)
+			vbox.Add(box, flag=wx.EXPAND | wx.ALL)
 
-		hbox1.Add(self.field1, flag=wx.LEFT | wx.CENTER, border=5)
-		hbox2.Add(self.field2, flag=wx.LEFT | wx.CENTER, border=5)
-		hbox3.Add(self.field3, flag=wx.LEFT | wx.CENTER, border=5)
-
-		vbox.Add(hbox1)
-		vbox.Add(hbox2)
-		vbox.Add(hbox3)
-
-		self.field1.Bind(
-			wx.EVT_TEXT_ENTER,
-			lambda event,
-			temp=0: self.onEnter(event, temp)
-		)
-		self.field2.Bind(
-			wx.EVT_TEXT_ENTER,
-			lambda event,
-			temp=1: self.onEnter(event, temp)
-		)
-		self.field3.Bind(
-			wx.EVT_TEXT_ENTER,
-			lambda event,
-			temp=2: self.onEnter(event, temp)
-		)
+		for index, field in zip(
+			range(0, 3),
+			[self.field1, self.field2, self.field3]):
+			field.Bind(
+				wx.EVT_TEXT_ENTER,
+				lambda event,
+				temp=index: self.onEnter(event, temp)
+			)
 
 		self.SetSizer(vbox)
-		self.SetBackgroundColour("gray")
+		self.SetBackgroundColour(
+			"gray" if self.config.loadedConfig["theme"] == "dark" else "white"
+		)
 		self.Show()
 
 	def onEnter(self, event, buttonLabel):

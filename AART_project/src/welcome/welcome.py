@@ -3,12 +3,13 @@ import wx.lib.scrolledpanel as scrolled
 import os
 
 class welcomeGuide(wx.Dialog):
-	def __init__(self, *args, path, **kwargs):
+	def __init__(self, *args, path, config, **kwargs):
 		super(welcomeGuide, self).__init__(*args, **kwargs)
 
 		self.logo = wx.Image("{}/logo.png".format(os.path.dirname(path)))
 		self.bmp = None
 		self.sp = None
+		self.config = config
 
 		self.initUI()
 		self.Show()
@@ -24,15 +25,21 @@ class welcomeGuide(wx.Dialog):
 
 		w, h = self.GetSize()
 		text = wx.StaticText(self, label="Recent files", style=wx.ALIGN_CENTER)
-		text.SetForegroundColour("white")
-		text.SetBackgroundColour("#666666")
+
+		if self.config.loadedConfig["theme"] == "dark":
+			text.SetForegroundColour("white")
+			text.SetBackgroundColour("#666666")
+		else:
+			text.SetForegroundColour("black")
+			text.SetBackgroundColour("#e2e2e2")
+
 		text.SetFont(wx.Font(
-			14,
+			self.config.loadedConfig["fontSize"],
 			family=wx.DEFAULT,
 			style=wx.NORMAL,
 			weight=wx.NORMAL)
 		)
-		text.SetMinSize((w - h - 100, 25))
+		text.SetMinSize((w - h - 100, self.config.loadedConfig["fontSize"] + 10))
 		spBox.Add(text, flag=wx.EXPAND | wx.ALL)
 
 		for i in range(1, 30):
@@ -48,8 +55,10 @@ class welcomeGuide(wx.Dialog):
 		)
 		vbox.Add(hbox, flag=wx.ALL | wx.EXPAND)
 
-		# vbox.SetMinSize((w - h, h))
-		self.SetBackgroundColour("gray")
+		if self.config.loadedConfig["theme"] == "dark":
+			self.SetBackgroundColour("gray")
+		else:
+			self.SetBackgroundColour("white")
 		self.SetSizer(vbox)
 
 	def initScrolledPanel(self):

@@ -7,6 +7,7 @@ from src.input.input import InputPanel
 from src.media.media import MediaPanel
 from src.output.output import outputTextPanel, outputPicPanel
 from src.welcome.welcome import welcomeGuide
+from src.config.configJSON import Config
 
 class Frame(wx.Frame):
 	def __init__(self, parent, title):
@@ -15,19 +16,23 @@ class Frame(wx.Frame):
 		self.currentScreenY = 0
 		self.initSize()
 
+		self.config = Config(os.path.abspath(__file__))
+
 		self.mediaPanel = MediaPanel(
 			self,
 			size=(
 				self.currentScreenX * 0.7,
 				self.currentScreenY * 0.7
-			)
+			),
+			config=self.config
 		)
 		self.outputPicPanel = outputPicPanel(
 			self,
 			size=(
 				self.currentScreenX * 0.7,
 				self.currentScreenY * 0.3
-			)
+			),
+			config=self.config
 		)
 
 		self.inputPanel = InputPanel(
@@ -35,21 +40,24 @@ class Frame(wx.Frame):
 			size=(
 				self.currentScreenX * 0.3,
 				self.currentScreenY * 0.3
-			)
+			),
+			config=self.config
 		)
 		self.outputTextPanel = outputTextPanel(
 			self,
 			size=(
 				self.currentScreenX * 0.3,
 				self.currentScreenY * 0.7
-			)
+			),
+			config=self.config
 		)
 
 		self.welcome = welcomeGuide(
 			None,
 			title="Welcome to AART",
 			size=(self.currentScreenX * 0.5, self.currentScreenY * 0.5),
-			path=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+			path=os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+			config=self.config
 		)
 
 		self.initUI()
@@ -119,12 +127,16 @@ class Frame(wx.Frame):
 		menuBar.Append(fileMenu, "&File")
 		self.SetMenuBar(menuBar)
 
-		self.Bind(wx.EVT_MENU, self.OnQuit, id=wx.ID_EXIT)
+		self.Bind(wx.EVT_MENU, self.onQuit, id=wx.ID_EXIT)
 		self.Bind(wx.EVT_MENU, self.onOpenVideo, id=wx.ID_OPEN)
 		self.Bind(wx.EVT_MENU, self.onSelectCamera, id=11)
 
 	def onSelectCamera(self, event):
-		dialog = SelectDeviceDialog(None, title="Select web camera")
+		dialog = SelectDeviceDialog(
+			None,
+			title="Select web camera",
+			config=self.config
+		)
 		dialog.ShowModal()
 		self.mediaPanel.doSelect((int)(dialog.deviceID))
 		dialog.Destroy()
@@ -141,9 +153,11 @@ class Frame(wx.Frame):
 			paths = dialog.GetPaths()
 			for path in paths:
 				self.mediaPanel.doLoad(path)
+				self.config.loadedConfig["recent"].append(path)
 		dialog.Destroy()
 
-	def OnQuit(self, event):
+	def onQuit(self, event):
+		self.config.save()
 		self.Close()
 
 if __name__ == '__main__':

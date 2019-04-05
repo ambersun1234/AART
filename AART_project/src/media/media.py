@@ -8,7 +8,7 @@ class previewCamera(wx.Panel):
 
 		self.deviceIDT = deviceID
 		self.deviceID = deviceID
-		self.fps = 30
+		self.fps = 20
 		self.timer = wx.Timer(self)
 		self.timer.Start(1000. / self.fps)
 
@@ -47,11 +47,12 @@ class previewCamera(wx.Panel):
 			self.Refresh()
 
 class MediaPanel(wx.Panel):
-	def __init__(self, parent, size):
+	def __init__(self, parent, size, config):
 		wx.Panel.__init__(self, parent, size=size)
 
 		self.type = {"webcam": 0, "video": 1}
 		self.choice = self.type["webcam"]
+		self.config = config
 		self.captureID = -1
 		self.cap = None
 		self.videoPath = ""
@@ -69,7 +70,9 @@ class MediaPanel(wx.Panel):
 		self.initUI()
 
 	def initUI(self):
-		self.SetBackgroundColour("gray")
+		self.SetBackgroundColour(
+			"gray" if self.config.loadedConfig["theme"] == "dark" else "white"
+		)
 		self.Show()
 
 	def onPaint(self, event):
