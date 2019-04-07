@@ -46,7 +46,7 @@ class SelectDeviceDialog(wx.Dialog):
 			"white" if self.config.loadedConfig["theme"] == "dark" else "black"
 		)
 		self.SetBackgroundColour(
-			"gray" if self.config.loadedConfig["theme"] == "dark" else "white"
+			"#4c4c4c" if self.config.loadedConfig["theme"] == "dark" else "white"
 		)
 
 		vbox = wx.BoxSizer(wx.VERTICAL)
@@ -97,7 +97,7 @@ class SelectDeviceDialog(wx.Dialog):
 			"white" if self.config.loadedConfig["theme"] == "dark" else "black"
 		)
 		self.SetBackgroundColour(
-			"gray" if self.config.loadedConfig["theme"] == "dark" else "white"
+			"#4c4c4c" if self.config.loadedConfig["theme"] == "dark" else "white"
 		)
 
 		# boxsizer declaration

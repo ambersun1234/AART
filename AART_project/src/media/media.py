@@ -71,7 +71,7 @@ class MediaPanel(wx.Panel):
 
 	def initUI(self):
 		self.SetBackgroundColour(
-			"gray" if self.config.loadedConfig["theme"] == "dark" else "white"
+			"#4c4c4c" if self.config.loadedConfig["theme"] == "dark" else "white"
 		)
 		self.Show()
 

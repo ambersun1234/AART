@@ -56,7 +56,7 @@ class welcomeGuide(wx.Dialog):
 		vbox.Add(hbox, flag=wx.ALL | wx.EXPAND)
 
 		if self.config.loadedConfig["theme"] == "dark":
-			self.SetBackgroundColour("gray")
+			self.SetBackgroundColour("#4c4c4c")
 		else:
 			self.SetBackgroundColour("white")
 		self.SetSizer(vbox)

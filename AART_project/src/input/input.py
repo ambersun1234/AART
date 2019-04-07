@@ -22,7 +22,7 @@ class InputPanel(wx.Panel):
 		hbox2 = wx.BoxSizer(wx.HORIZONTAL)
 		hbox3 = wx.BoxSizer(wx.HORIZONTAL)
 
-		title = wx.StaticText(self, label="Athlete trace: ")
+		title = wx.StaticText(self, label=" Athlete trace: ")
 		title.SetForegroundColour(
 			"white" if self.config.loadedConfig["theme"] == "dark" else "black"
 		)
@@ -41,7 +41,7 @@ class InputPanel(wx.Panel):
 
 		sta = list()
 		for index in range(1, 4):
-			sta.append(wx.StaticText(self, label="person{}: ".format(index)))
+			sta.append(wx.StaticText(self, label="   person{}: ".format(index)))
 
 		for element in sta:
 			element.SetForegroundColour(
@@ -58,7 +58,7 @@ class InputPanel(wx.Panel):
 			sta, [hbox1, hbox2, hbox3],
 			[self.field1, self.field2, self.field3]):
 			box.Add(item, border=5)
-			box.Add(field, border=5, flag=wx.EXPAND)
+			box.Add(field, border=5, flag=wx.EXPAND | wx.ALL, proportion=3)
 			vbox.Add(box, flag=wx.EXPAND | wx.ALL)
 
 		for index, field in zip(
@@ -72,7 +72,7 @@ class InputPanel(wx.Panel):
 
 		self.SetSizer(vbox)
 		self.SetBackgroundColour(
-			"gray" if self.config.loadedConfig["theme"] == "dark" else "white"
+			"#4c4c4c" if self.config.loadedConfig["theme"] == "dark" else "white"
 		)
 		self.Show()
 
