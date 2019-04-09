@@ -2,7 +2,7 @@ import wx
 import wx.media
 import cv2
 
-class previewCamera(wx.Panel):
+class PreviewCamera(wx.Panel):
 	def __init__(self, parent, deviceID):
 		wx.Panel.__init__(self, parent)
 

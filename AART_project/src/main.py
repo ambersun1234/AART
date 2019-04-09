@@ -5,8 +5,8 @@ import os
 from src.device.device import SelectDeviceDialog
 from src.input.input import InputPanel
 from src.media.media import MediaPanel
-from src.output.output import outputTextPanel, outputPicPanel
-from src.welcome.welcome import welcomeGuide
+from src.output.output import OutputTextPanel, OutputPicPanel
+from src.welcome.welcome import WelcomeGuide
 from src.config.configJSON import Config
 
 class Frame(wx.Frame):
@@ -26,7 +26,7 @@ class Frame(wx.Frame):
 			),
 			config=self.config
 		)
-		self.outputPicPanel = outputPicPanel(
+		self.OutputPicPanel = OutputPicPanel(
 			self,
 			size=(
 				self.currentScreenX * 0.7,
@@ -43,7 +43,7 @@ class Frame(wx.Frame):
 			),
 			config=self.config
 		)
-		self.outputTextPanel = outputTextPanel(
+		self.OutputTextPanel = OutputTextPanel(
 			self,
 			size=(
 				self.currentScreenX * 0.3,
@@ -52,7 +52,7 @@ class Frame(wx.Frame):
 			config=self.config
 		)
 
-		self.welcome = welcomeGuide(
+		self.welcome = WelcomeGuide(
 			None,
 			title="Welcome to AART",
 			size=(self.currentScreenX * 0.5, self.currentScreenY * 0.5),
@@ -71,9 +71,9 @@ class Frame(wx.Frame):
 
 		hboxUp.Add(self.mediaPanel)
 		hboxUp.AddSpacer(5)  # add 5px space
-		hboxUp.Add(self.outputTextPanel)
+		hboxUp.Add(self.OutputTextPanel)
 
-		hboxBottom.Add(self.outputPicPanel)
+		hboxBottom.Add(self.OutputPicPanel)
 		hboxBottom.AddSpacer(5)  # add 5px space
 		hboxBottom.Add(self.inputPanel)
 
@@ -145,7 +145,7 @@ class Frame(wx.Frame):
 		dialog = wx.FileDialog(
 			self,
 			message="Choose a file",
-			wildcard="*.mp4",
+			wildcard="Video files(*.mp4;*.avi)|*.mp4;*.avi",
 			defaultFile="",
 			style=wx.FD_OPEN | wx.FD_CHANGE_DIR
 		)
@@ -153,11 +153,12 @@ class Frame(wx.Frame):
 			paths = dialog.GetPaths()
 			for path in paths:
 				self.mediaPanel.doLoad(path)
-				self.config.loadedConfig["recent"].append(path)
+				self.config.storePath(path)
+				self.config.save()
+
 		dialog.Destroy()
 
 	def onQuit(self, event):
-		self.config.save()
 		self.Close()
 
 if __name__ == '__main__':

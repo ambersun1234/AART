@@ -3,7 +3,7 @@ import subprocess
 
 import os
 
-from src.media.media import previewCamera
+from src.media.media import PreviewCamera
 
 class SelectDeviceDialog(wx.Dialog):
 	def __init__(self, *args, config, **kwargs):
@@ -17,7 +17,7 @@ class SelectDeviceDialog(wx.Dialog):
 
 		# no available web camera device found on current pc
 		if self.deviceCheck:
-			self.preview = previewCamera(self, 0)
+			self.preview = PreviewCamera(self, 0)
 			self.InitDeviceUI()
 			self.initSize()
 		else:

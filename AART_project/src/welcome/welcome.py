@@ -2,9 +2,9 @@ import wx
 import wx.lib.scrolledpanel as scrolled
 import os
 
-class welcomeGuide(wx.Dialog):
+class WelcomeGuide(wx.Dialog):
 	def __init__(self, *args, path, config, **kwargs):
-		super(welcomeGuide, self).__init__(*args, **kwargs)
+		super(WelcomeGuide, self).__init__(*args, **kwargs)
 
 		self.logo = wx.Image("{}/logo.png".format(os.path.dirname(path)))
 		self.bmp = None
@@ -39,7 +39,7 @@ class welcomeGuide(wx.Dialog):
 			style=wx.NORMAL,
 			weight=wx.NORMAL)
 		)
-		text.SetMinSize((w - h - 100, self.config.loadedConfig["fontSize"] + 10))
+		text.SetMinSize((w - h - 100, self.config.loadedConfig["fontSize"] + 7))
 		spBox.Add(text, flag=wx.EXPAND | wx.ALL)
 
 		for i in range(1, 30):

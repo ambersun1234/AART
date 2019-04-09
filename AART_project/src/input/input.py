@@ -4,9 +4,10 @@ class InputPanel(wx.Panel):
 	def __init__(self, parent, size, config):
 		wx.Panel.__init__(self, parent, size=size)
 
-		self.field1 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
-		self.field2 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
-		self.field3 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+		self.field = dict()
+		for i in range(0, 3):
+			# self.field.append(wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER))
+			self.field[i] = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
 		# textCtrl must contain wx.TE_PROCESS_ENTER => event: EVT_TEXT_ENTER
 
 		self.config = config
@@ -54,21 +55,41 @@ class InputPanel(wx.Panel):
 				weight=wx.NORMAL
 			))
 
-		for item, box, field in zip(
-			sta, [hbox1, hbox2, hbox3],
-			[self.field1, self.field2, self.field3]):
+		# add static text and field
+		for index, item, box in zip(
+			range(0, 3), sta,
+			[hbox1, hbox2, hbox3]):
 			box.Add(item, border=5)
-			box.Add(field, border=5, flag=wx.EXPAND | wx.ALL, proportion=3)
-			vbox.Add(box, flag=wx.EXPAND | wx.ALL)
+			box.Add(self.field[index], border=5, flag=wx.EXPAND | wx.ALL, proportion=3)
 
-		for index, field in zip(
-			range(0, 3),
-			[self.field1, self.field2, self.field3]):
-			field.Bind(
+			self.field[index].Bind(
 				wx.EVT_TEXT_ENTER,
 				lambda event,
 				temp=index: self.onEnter(event, temp)
 			)
+
+			# button ok
+			ok = wx.Button(self, label="Ok", size=(60, 30))
+			ok.SetForegroundColour("green")
+			box.Add(ok, flag=wx.ALL, border=5)
+			ok.Bind(
+				wx.EVT_BUTTON,
+				lambda event,
+				temp=index: self.onEnter(event, temp)
+			)
+
+			# button close
+			close = wx.Button(self, label="Clear", size=(60, 30))
+			close.SetForegroundColour("red")
+			box.Add(close, flag=wx.ALL, border=5)
+			close.Bind(
+				wx.EVT_BUTTON,
+				lambda event,
+				temp=index: self.onClear(event, temp)
+			)
+
+			# add to vertical
+			vbox.Add(box, flag=wx.EXPAND | wx.ALL)
 
 		self.SetSizer(vbox)
 		self.SetBackgroundColour(
@@ -76,9 +97,16 @@ class InputPanel(wx.Panel):
 		)
 		self.Show()
 
+	def onClear(self, event, buttonLabel):
+		self.input[buttonLabel] = ""
+		print(self.input)
+
 	def onEnter(self, event, buttonLabel):
-		self.input[buttonLabel] = event.GetString() \
-			if self.inputCheck(event.GetString()) else ""
+		input_t = self.field[buttonLabel].GetValue()
+
+		self.input[buttonLabel] = input_t \
+			if self.inputCheck(input_t) \
+			else self.input.get(buttonLabel, "")
 		print(self.input)
 
 	def inputCheck(self, input):

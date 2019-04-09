@@ -1,7 +1,7 @@
 import wx
 import wx.lib.scrolledpanel as scrolled
 
-class outputTextPanel(wx.Panel):
+class OutputTextPanel(wx.Panel):
 	def __init__(self, parent, size, config):
 		wx.Panel.__init__(self, parent, size=size)
 
@@ -100,7 +100,7 @@ class outputTextPanel(wx.Panel):
 		self.SetSizer(vbox)
 		self.Show()
 
-class outputPicPanel(wx.Panel):
+class OutputPicPanel(wx.Panel):
 	def __init__(self, parent, size, config):
 		wx.Panel.__init__(self, parent, size=size)
 		self.config = config
