@@ -1,5 +1,6 @@
 import wx
 import wx.media
+import sys
 import os
 
 from src.device.device import SelectDeviceDialog
@@ -53,7 +54,7 @@ class Frame(wx.Frame):
 		)
 
 		self.welcome = WelcomeGuide(
-			None,
+			self,
 			title="Welcome to AART",
 			size=(self.currentScreenX * 0.5, self.currentScreenY * 0.5),
 			path=os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
@@ -70,21 +71,30 @@ class Frame(wx.Frame):
 		hboxBottom = wx.BoxSizer(wx.HORIZONTAL)
 
 		hboxUp.Add(self.mediaPanel)
-		hboxUp.AddSpacer(5)  # add 5px space
+		line = wx.StaticLine(self, size=(5, 5), style=wx.LI_VERTICAL)
+		line.SetForegroundColour("#f75b25")
+		hboxUp.Add(line)
 		hboxUp.Add(self.OutputTextPanel)
 
 		hboxBottom.Add(self.OutputPicPanel)
-		hboxBottom.AddSpacer(5)  # add 5px space
+		line = wx.StaticLine(self, size=(5, 5), style=wx.LI_VERTICAL)
+		line.SetBackgroundColour("#f75b25")
+		hboxBottom.Add(line)
 		hboxBottom.Add(self.inputPanel)
 
 		vbox.Add(hboxUp)
-		vbox.AddSpacer(5)
+		line = wx.StaticLine(self, size=(5, 5), style=wx.LI_VERTICAL)
+		line.SetBackgroundColour("#f75b25")
+		vbox.Add(line)
 		vbox.Add(hboxBottom)
 
 		self.SetSizer(vbox)
 		self.Show()
 
 		self.welcome.ShowModal()
+		if not self.welcome.path == "":
+			self.mediaPanel.doLoad(self.welcome.path)
+		self.welcome.Destroy()
 
 	def getMinResolution(self):
 		rx = 7680
@@ -123,13 +133,19 @@ class Frame(wx.Frame):
 		op.Append(wx.ID_OPEN, "&Select Video", "Select video")
 		fileMenu.Append(wx.ID_ANY, "&Open", op)
 		fileMenu.Append(wx.ID_EXIT, "&Quit", "Quit application")
+		fileMenu.Append(-1, "&Restart\tCtrl+r", "Restart program")
 
 		menuBar.Append(fileMenu, "&File")
 		self.SetMenuBar(menuBar)
 
 		self.Bind(wx.EVT_MENU, self.onQuit, id=wx.ID_EXIT)
+		self.Bind(wx.EVT_MENU, self.onRestart, id=-1)
 		self.Bind(wx.EVT_MENU, self.onOpenVideo, id=wx.ID_OPEN)
 		self.Bind(wx.EVT_MENU, self.onSelectCamera, id=11)
+
+	def onRestart(self, event):
+		# restart program
+		os.execl(sys.executable, "python", __file__, *sys.argv[1:])
 
 	def onSelectCamera(self, event):
 		dialog = SelectDeviceDialog(
