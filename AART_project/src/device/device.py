@@ -116,7 +116,7 @@ class SelectDeviceDialog(wx.Dialog):
 		count = 0
 		for key, value in self.device.items():
 			if count == 0:
-				self.deviceID_t = (int)(value)
+				self.deviceID_t = int(value)
 			temp = wx.RadioButton(pnl, label=key)
 			temp.SetFont(wx.Font(
 				self.config.loadedConfig["fontSize"],

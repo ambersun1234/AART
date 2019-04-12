@@ -154,7 +154,7 @@ class Frame(wx.Frame):
 			config=self.config
 		)
 		dialog.ShowModal()
-		self.mediaPanel.doSelect((int)(dialog.deviceID))
+		self.mediaPanel.doSelect(int(dialog.deviceID))
 		dialog.Destroy()
 
 	def onOpenVideo(self, event):
