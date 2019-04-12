@@ -17,7 +17,7 @@ class SelectDeviceDialog(wx.Dialog):
 
 		# no available web camera device found on current pc
 		if self.deviceCheck:
-			self.preview = PreviewCamera(self, 0)
+			self.preview = None
 			self.InitDeviceUI()
 			self.initSize()
 		else:
@@ -124,8 +124,9 @@ class SelectDeviceDialog(wx.Dialog):
 				style=wx.NORMAL,
 				weight=wx.NORMAL)
 			)
-			sbs.Add(temp)
+			sbs.Add(temp, flag=wx.ALL | wx.EXPAND)
 			count += 1
+		self.preview = PreviewCamera(self, 0)
 
 		okButton = wx.Button(self, label='Ok')
 		closeButton = wx.Button(self, label='Close')
