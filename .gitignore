@@ -1,4 +1,3 @@
-*.weights
 input/*
 config.py
 venv/
