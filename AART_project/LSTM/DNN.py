@@ -11,14 +11,14 @@ from sklearn.metrics import classification_report
 from sklearn import preprocessing
 
 import keras
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, Flatten, Reshape
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Flatten, Reshape
 from keras.layers import Conv2D, MaxPooling2D
 from keras.utils import np_utils
 
 # Set some standard parameters upfront
 pd.options.display.float_format = '{:.1f}'.format
-sns.set()  # Default seaborn look and feel
+sns.set() # Default seaborn look and feel
 plt.style.use('ggplot')
 print('keras version ', keras.__version__)
 # shooting => 投籃, layup => 上籃, dribble => 運球
@@ -64,8 +64,7 @@ def read_data(file_path):
                      header=None,
                      names=column_names)
     # Last column has a ";" character which must be removed ...
-    df['footBoardL3_y'].replace(
-        regex=True, inplace=True, to_replace=r';', value=r'')
+    df['footBoardL3_y'].replace(regex=True, inplace=True, to_replace=r';', value=r'')
     # ... and then this column must be transformed to float explicitly
     # df['footBoardL3_y'] = df['footBoardL3_y'].apply(convert_to_float)
     # This is very important otherwise the model will not fit and loss
@@ -93,8 +92,7 @@ show_basic_dataframe_info(df)
 df.head(20)
 
 # Show how many training examples exist for each of the six activities
-df['type'].value_counts().plot(
-    kind='bar', title='Training Examples by Activity Type')
+df['type'].value_counts().plot(kind='bar', title='Training Examples by Activity Type')
 # plt.show()
 # Better understand how the recordings are spread across the different
 # users who participated in the study
@@ -108,8 +106,7 @@ le = preprocessing.LabelEncoder()
 # Add a new column to the existing DataFrame with the encoded values
 df[LABEL] = le.fit_transform(df['type'].values.ravel())
 
-df_train = read_data(
-    '/home/louisme/PycharmProjects/LSTM/LSTMDataset_train.txt')
+df_train = read_data('/home/louisme/PycharmProjects/LSTM/LSTMDataset_train.txt')
 df_train[LABEL] = le.fit_transform(df_train['type'].values.ravel())
 df_test = read_data('/home/louisme/PycharmProjects/LSTM/LSTMDataset_test.txt')
 df_test[LABEL] = le.fit_transform(df_test['type'].values.ravel())
@@ -185,15 +182,13 @@ def create_segments_and_labels(df, time_steps, step, label_name):
                          footboardl3_x, footboardl3_y])
         labels.append(label)
     # Bring the segments into a better shape
-    reshaped_segments = np.asarray(
-        segments, dtype=np.float32).reshape(-1, time_steps, nfeatures)
+    reshaped_segments = np.asarray(segments, dtype=np.float32).reshape(-1, time_steps, nfeatures)
     labels = np.asarray(labels)
 
     return reshaped_segments, labels
 
 
-x_train, y_train = create_segments_and_labels(
-    df_train, TIME_PERIODS, STEP_DISTANCE, LABEL)
+x_train, y_train = create_segments_and_labels(df_train, TIME_PERIODS, STEP_DISTANCE, LABEL)
 print('x_train shape: ', x_train.shape)
 print(x_train.shape[0], 'training samples')
 print('y_train shape: ', y_train.shape)

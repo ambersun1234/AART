@@ -41,10 +41,8 @@ columns = ['user_id', 'activity', 'photo number',
            'footBoardL1_x', 'footBoardL1_y',
            'footBoardL2_x', 'footBoardL2_y',
            'footBoardL3_x', 'footBoardL3_y']
-df = pd.read_csv(
-    '/home/louisme/PycharmProjects/LSTM/LSTMDataset.txt', header=None, names=columns)
-df['footBoardL3_y'].replace(
-    regex=True, inplace=True, to_replace=r';', value=r'')
+df = pd.read_csv('/home/louisme/PycharmProjects/LSTM/LSTMDataset.txt', header=None, names=columns)
+df['footBoardL3_y'].replace(regex=True, inplace=True, to_replace=r';', value=r'')
 df.head()
 
 time_steps = 60
@@ -113,12 +111,10 @@ for i in range(0, len(df) - time_steps, step):
                      footboardl3_x, footboardl3_y])
     labels.append(label)
 # print(np.array(segments).shape)
-reshaped_segments = np.asarray(
-    segments, dtype=np.float32).reshape(-1, time_steps, N_FEATURES)
+reshaped_segments = np.asarray(segments, dtype=np.float32).reshape(-1, time_steps, N_FEATURES)
 labels = np.asarray(pd.get_dummies(labels), dtype=np.float32)
 # print(reshaped_segments.shape)
-X_train, X_test, y_train, y_test = train_test_split(
-    reshaped_segments, labels, test_size=0.2, random_state=RANDOM_SEED)
+X_train, X_test, y_train, y_test = train_test_split(reshaped_segments, labels, test_size=0.2, random_state=RANDOM_SEED)
 
 # Building the model
 N_CLASSES = 3
@@ -141,12 +137,10 @@ def create_lstm_model(inputs):
     hidden = tf.split(hidden, time_steps, 0)
 
     # Stack 2 LSTM layers
-    lstm_layers = [tf.contrib.rnn.BasicLSTMCell(
-        N_HIDDEN_UNITS, forget_bias=1.0) for _ in range(2)]
+    lstm_layers = [tf.contrib.rnn.BasicLSTMCell(N_HIDDEN_UNITS, forget_bias=1.0) for _ in range(2)]
     lstm_layers = tf.contrib.rnn.MultiRNNCell(lstm_layers)
 
-    outputs, _ = tf.contrib.rnn.static_rnn(
-        lstm_layers, hidden, dtype=tf.float32)
+    outputs, _ = tf.contrib.rnn.static_rnn(lstm_layers, hidden, dtype=tf.float32)
 
     # Get output for the last time step
     lstm_last_output = outputs[-1]
@@ -163,11 +157,9 @@ pred_Y = create_lstm_model(X)
 pred_softmax = tf.nn.softmax(pred_Y, name="y_")
 L2_LOSS = 0.0015
 
-l2 = L2_LOSS * sum(tf.nn.l2_loss(tf_var)
-                   for tf_var in tf.trainable_variables())
+l2 = L2_LOSS * sum(tf.nn.l2_loss(tf_var) for tf_var in tf.trainable_variables())
 
-loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(
-    logits=pred_Y, labels=Y)) + l2
+loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=pred_Y, labels=Y)) + l2
 
 LEARNING_RATE = 0.0025
 
@@ -176,8 +168,8 @@ optimizer = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE).minimize(loss)
 correct_pred = tf.equal(tf.argmax(pred_softmax, 1), tf.argmax(Y, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_pred, dtype=tf.float32))
 
-N_EPOCHS = 50
-BATCH_SIZE = 1024
+N_EPOCHS = 5000
+BATCH_SIZE = 30
 saver = tf.train.Saver()
 
 history = dict(train_loss=[],
@@ -212,8 +204,7 @@ for i in range(1, N_EPOCHS + 1):
 
     print('epoch: {} test accuracy: {} loss: {}'.format(i, acc_test, loss_test))
 
-predictions, acc_final, loss_final = sess.run(
-    [pred_softmax, accuracy, loss], feed_dict={X: X_test, Y: y_test})
+predictions, acc_final, loss_final = sess.run([pred_softmax, accuracy, loss], feed_dict={X: X_test, Y: y_test})
 
 print()
 print('final results: accuracy: {} loss: {}'.format(acc_final, loss_final))
@@ -223,3 +214,26 @@ pickle.dump(history, open("history.p", "wb"))
 tf.train.write_graph(sess.graph_def, '.', './checkpoint/har.pbtxt')
 saver.save(sess, save_path="./checkpoint/har.ckpt")
 sess.close()
+
+plt.figure(figsize=(12, 8))
+plt.plot(np.array(history['train_loss']), "r--", label="Train loss")
+plt.plot(np.array(history['train_acc']), "g--", label="Train accuracy")
+plt.plot(np.array(history['test_loss']), "r-", label="Test loss")
+plt.plot(np.array(history['test_acc']), "g-", label="Test accuracy")
+plt.title("Training session's progress over iterations")
+plt.legend(loc='upper right', shadow=True)
+plt.ylabel('Training Progress (Loss or Accuracy values)')
+plt.xlabel('Training Epoch')
+plt.ylim(0)
+plt.show()
+
+LABELS = ['shooting', 'layup', 'dribble']
+max_test = np.argmax(y_test, axis=1)
+max_predictions = np.argmax(predictions, axis=1)
+confusion_matrix = metrics.confusion_matrix(max_test, max_predictions)
+plt.figure(figsize=(16, 14))
+sns.heatmap(confusion_matrix, xticklabels=LABELS, yticklabels=LABELS, annot=True, fmt="d");
+plt.title("Confusion matrix")
+plt.ylabel('True label')
+plt.xlabel('Predicted label')
+plt.show();
