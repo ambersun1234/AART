@@ -16,7 +16,6 @@ rcParams['figure.figsize'] = 14, 8
 
 RANDOM_SEED = 42
 columns = ['user_id', 'activity', 'photo number',
-           'nose_x', 'nose_y',
            'neck_x', 'neck_y',
            'shoulderR_x', 'shoulderR_y',
            'elbowR_x', 'elbowR_y',
@@ -25,34 +24,22 @@ columns = ['user_id', 'activity', 'photo number',
            'elbowL_x', 'elbowL_y',
            'handL_x', 'handL_y',
            'ass_x', 'ass_y',
-           'legR_x', 'legR_y',
            'kneeR_x', 'kneeR_y',
            'feetR_x', 'feetR_y',
-           'legL_x', 'legL_y',
            'kneeL_x', 'kneeL_y',
-           'feetL_x', 'feetL_y',
-           'eyeR_x', 'eyeR_y',
-           'eyeL_x', 'eyeL_y',
-           'earR_x', 'earR_y',
-           'earL_x', 'earL_y',
-           'footBoardR1_x', 'footBoardR1_y',
-           'footBoardR2_x', 'footBoardR2_y',
-           'footBoardR3_x', 'footBoardR3_y',
-           'footBoardL1_x', 'footBoardL1_y',
-           'footBoardL2_x', 'footBoardL2_y',
-           'footBoardL3_x', 'footBoardL3_y']
+           'feetL_x', 'feetL_y']
 df = pd.read_csv('/home/louisme/PycharmProjects/LSTM/LSTMDataset.txt', header=None, names=columns)
-df['footBoardL3_y'].replace(regex=True, inplace=True, to_replace=r';', value=r'')
+df['feetL_y'].replace(regex=True, inplace=True, to_replace=r';', value=r'')
 df.head()
-
+# 30FPS * 2sec = 60
 time_steps = 60
-N_FEATURES = 50
+# 50 data for one input
+N_FEATURES = 24
+# step is for overlapping
 step = 20
 segments = []
 labels = []
 for i in range(0, len(df) - time_steps, step):
-    nose_x = df['nose_x'].values[i: i + time_steps]
-    nose_y = df['nose_y'].values[i: i + time_steps]
     neck_x = df['neck_x'].values[i: i + time_steps]
     neck_y = df['neck_y'].values[i: i + time_steps]
     shoulderr_x = df['shoulderR_x'].values[i: i + time_steps]
@@ -69,46 +56,20 @@ for i in range(0, len(df) - time_steps, step):
     handl_y = df['handL_y'].values[i: i + time_steps]
     ass_x = df['ass_x'].values[i: i + time_steps]
     ass_y = df['ass_y'].values[i: i + time_steps]
-    legr_x = df['legR_x'].values[i: i + time_steps]
-    legr_y = df['legR_y'].values[i: i + time_steps]
     kneer_x = df['kneeR_x'].values[i: i + time_steps]
     kneer_y = df['kneeR_y'].values[i: i + time_steps]
     feetr_x = df['feetR_x'].values[i: i + time_steps]
     feetr_y = df['feetR_y'].values[i: i + time_steps]
-    legl_x = df['legL_x'].values[i: i + time_steps]
-    legl_y = df['legL_y'].values[i: i + time_steps]
     kneel_x = df['kneeL_x'].values[i: i + time_steps]
     kneel_y = df['kneeL_y'].values[i: i + time_steps]
     feetl_x = df['feetL_x'].values[i: i + time_steps]
     feetl_y = df['feetL_y'].values[i: i + time_steps]
-    eyer_x = df['eyeR_x'].values[i: i + time_steps]
-    eyer_y = df['eyeR_y'].values[i: i + time_steps]
-    eyel_x = df['eyeL_x'].values[i: i + time_steps]
-    eyel_y = df['eyeL_y'].values[i: i + time_steps]
-    earr_x = df['earR_x'].values[i: i + time_steps]
-    earr_y = df['earR_y'].values[i: i + time_steps]
-    earl_x = df['earL_x'].values[i: i + time_steps]
-    earl_y = df['earL_y'].values[i: i + time_steps]
-    footboardr1_x = df['footBoardR1_x'].values[i: i + time_steps]
-    footboardr1_y = df['footBoardR1_y'].values[i: i + time_steps]
-    footboardr2_x = df['footBoardR2_x'].values[i: i + time_steps]
-    footboardr2_y = df['footBoardR2_y'].values[i: i + time_steps]
-    footboardr3_x = df['footBoardR3_x'].values[i: i + time_steps]
-    footboardr3_y = df['footBoardR3_y'].values[i: i + time_steps]
-    footboardl1_x = df['footBoardL1_x'].values[i: i + time_steps]
-    footboardl1_y = df['footBoardL1_y'].values[i: i + time_steps]
-    footboardl2_x = df['footBoardL2_x'].values[i: i + time_steps]
-    footboardl2_y = df['footBoardL2_y'].values[i: i + time_steps]
-    footboardl3_x = df['footBoardL3_x'].values[i: i + time_steps]
-    footboardl3_y = df['footBoardL3_y'].values[i: i + time_steps]
+
     label = stats.mode(df['activity'][i: i + time_steps])[0][0]
-    segments.append([nose_x, nose_y, neck_x, neck_y, shoulderr_x, shoulderr_y, elbowr_x, elbowr_y,
+    segments.append([neck_x, neck_y, shoulderr_x, shoulderr_y, elbowr_x, elbowr_y,
                      handr_x, handr_y, shoulderl_x, shoulderl_y, elbowl_x, elbowl_y, handl_x, handl_y,
-                     ass_x, ass_y, legr_x, legr_y, kneer_x, kneer_y, feetr_x, feetr_y, legl_x, legl_y,
-                     kneel_x, kneel_y, feetl_x, feetl_y, eyer_x, eyer_y, eyel_x, eyel_y, earr_x, earr_y,
-                     earl_x, earl_y, footboardr1_x, footboardr1_y, footboardr2_x, footboardr2_y,
-                     footboardr3_x, footboardr3_y, footboardl1_x, footboardl1_y, footboardl2_x, footboardl2_y,
-                     footboardl3_x, footboardl3_y])
+                     ass_x, ass_y, kneer_x, kneer_y, feetr_x, feetr_y,
+                     kneel_x, kneel_y, feetl_x, feetl_y])
     labels.append(label)
 # print(np.array(segments).shape)
 reshaped_segments = np.asarray(segments, dtype=np.float32).reshape(-1, time_steps, N_FEATURES)
@@ -117,7 +78,9 @@ labels = np.asarray(pd.get_dummies(labels), dtype=np.float32)
 X_train, X_test, y_train, y_test = train_test_split(reshaped_segments, labels, test_size=0.2, random_state=RANDOM_SEED)
 
 # Building the model
+# Number of class
 N_CLASSES = 3
+# for a matrix size
 N_HIDDEN_UNITS = 64
 
 
@@ -169,7 +132,7 @@ correct_pred = tf.equal(tf.argmax(pred_softmax, 1), tf.argmax(Y, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_pred, dtype=tf.float32))
 
 N_EPOCHS = 5000
-BATCH_SIZE = 30
+BATCH_SIZE = 20
 saver = tf.train.Saver()
 
 history = dict(train_loss=[],

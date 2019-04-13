@@ -2,8 +2,8 @@ from tensorflow.python.tools import freeze_graph
 
 MODEL_NAME = 'har'
 
-input_graph_path = 'checkpoint/' + MODEL_NAME+'.pbtxt'
-checkpoint_path = './checkpoint/' +MODEL_NAME+'.ckpt'
+input_graph_path = 'checkpoint-2019-04-12-2001/' + MODEL_NAME+'.pbtxt'
+checkpoint_path = './checkpoint-2019-04-12-2001/' +MODEL_NAME+'.ckpt'
 restore_op_name = "save/restore_all"
 filename_tensor_name = "save/Const:0"
 output_frozen_graph_name = 'frozen_'+MODEL_NAME+'.pb'
