@@ -126,7 +126,7 @@ class SelectDeviceDialog(wx.Dialog):
 			)
 			sbs.Add(temp, flag=wx.ALL | wx.EXPAND)
 			count += 1
-		self.preview = PreviewCamera(self, 0)
+		self.preview = PreviewCamera(self, self.deviceID_t)
 
 		okButton = wx.Button(self, label='Ok')
 		closeButton = wx.Button(self, label='Close')

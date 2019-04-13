@@ -58,6 +58,7 @@ class MediaFrame(wx.Panel):
 		self.captureID = -1
 		self.cap = None
 		self.videoPath = ""
+		self.type = {"webcam": 0, "video": 1}
 
 		# set playing speed
 		self.fps = 30
@@ -80,6 +81,21 @@ class MediaFrame(wx.Panel):
 		dc.DrawBitmap(self.bmp, 0, 0)
 
 	def getNext(self, event):
+		# binding mediaBar slider event
+		if self.choice == self.type["video"]:
+			self.mediaBar.slider.Bind(
+				wx.EVT_SLIDER,
+				lambda event, val=self.mediaBar.slider.GetValue():
+				self.mediaBar.onChange(event, val)
+			)
+			self.cap.set(cv2.CAP_PROP_POS_FRAMES, self.mediaBar.slider.GetValue())
+
+		if self.choice == self.type["video"] and \
+			self.mediaBar.slider.GetValue() == self.mediaBar.slider.GetMax():
+			self.timer.Stop()
+			self.mediaBar.controlButton.SetLabel("Play")
+			# which means the video play to the end and stop
+
 		ret, frame = self.cap.read()
 
 		if ret:
@@ -91,6 +107,11 @@ class MediaFrame(wx.Panel):
 			)
 			frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 			self.bmp.CopyFromBuffer(frame)
+
+			# refresh mediaBar slider
+			if self.choice == self.type["video"]:
+				self.mediaBar.onTimer()
+
 			self.Refresh()
 
 	def iterate(self):
@@ -114,6 +135,14 @@ class MediaFrame(wx.Panel):
 				wx.ICON_ERROR | wx.OK
 			)
 		else:
+			if self.choice == self.type["video"]:
+				# set mediaBar slider max value
+				self.mediaBar.slider.SetMax(int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT)))
+			else:
+				self.mediaBar.slider.SetMin(0)
+				self.mediaBar.slider.SetMax(0)
+				self.mediaBar.slider.SetValue(1)
+
 			# read first image from current selected capture
 			ret, frame = self.cap.read()
 
@@ -136,9 +165,7 @@ class MediaFrame(wx.Panel):
 			# because wx.EVT_PAINT will execute immediately when bind success
 			self.Bind(wx.EVT_PAINT, self.onPaint)
 			self.Bind(wx.EVT_TIMER, self.getNext)
-
-			# key event binding
-			self.Bind(wx.EVT_CHAR_HOOK, self.onKey)
+			self.Bind(wx.EVT_CHAR, self.onKey)
 
 			self.timer.Start(1000. / self.fps)
 
@@ -146,23 +173,78 @@ class MediaFrame(wx.Panel):
 		keycode = event.GetKeyCode()
 
 		# play pause setup
-		if keycode == wx.WXK_SPACE:
-			self.control = not self.control
+		if keycode == wx.WXK_SPACE or chr(keycode) == "k" or chr(keycode) == "K":
 			# pause or play check based on self.control
-			if not self.control:
-				self.timer.Stop()
-				self.mediaBar.controlButton.SetLabel("Play")
-			else:
+			if self.choice == self.type["video"] and \
+				self.mediaBar.controlButton.GetLabel() == "Play" and \
+				self.mediaBar.slider.GetValue() == self.mediaBar.slider.GetMax():
+				self.mediaBar.slider.SetValue(0)
 				self.timer.Start(1000. / self.fps)
+				self.control = True
 				self.mediaBar.controlButton.SetLabel("Pause")
+				self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+			else:
+				if self.control:
+					self.timer.Stop()
+					self.mediaBar.controlButton.SetLabel("Play")
+				else:
+					self.timer.Start(1000. / self.fps)
+					self.mediaBar.controlButton.SetLabel("Pause")
+				self.control = not self.control
+
+		if self.choice == self.type["video"]:
+			if chr(keycode) == "j" or chr(keycode) == "J":
+				self.mediaBar.slider.SetValue(
+					self.mediaBar.slider.GetValue() - self.fps * 10
+				)
+				self.cap.set(cv2.CAP_PROP_POS_FRAMES, self.mediaBar.slider.GetValue())
+
+			elif chr(keycode) == "l" or chr(keycode) == "L":
+				self.mediaBar.slider.SetValue(
+					self.mediaBar.slider.GetValue() + self.fps * 10
+				)
+				self.cap.set(cv2.CAP_PROP_POS_FRAMES, self.mediaBar.slider.GetValue())
+
+			elif keycode == wx.WXK_LEFT:
+				self.mediaBar.slider.SetValue(
+					self.mediaBar.slider.GetValue() - self.fps * 5
+				)
+				self.cap.set(cv2.CAP_PROP_POS_FRAMES, self.mediaBar.slider.GetValue())
+
+			elif keycode == wx.WXK_RIGHT:
+				self.mediaBar.slider.SetValue(
+					self.mediaBar.slider.GetValue() + self.fps * 5
+				)
+				self.cap.set(cv2.CAP_PROP_POS_FRAMES, self.mediaBar.slider.GetValue())
+
+	def reinit(self):
+		self.fps = 30
+		self.videoPath = ""
+		self.cap = None
+		self.captureID = -1
+		self.control = True
+		self.choice = None
+		self.bmp = None
+
+		self.mediaBar.slider.SetMin(0)
+		self.mediaBar.slider.SetValue(0)
+		self.mediaBar.controlButton.SetLabel("Pause")
+		# reinitialize mediaFrame self variable
+		# since user may change webcam or video during broadcast
 
 	def load(self, path, choice):
+		self.reinit()
+		self.mediaBar.enableBtn()
+
 		self.videoPath = path
 		self.choice = choice
 		self.iterate()
 
 	def select(self, capID, choice):
 		if not capID == -1:
+			self.reinit()
+			self.mediaBar.disableBtn()
+
 			self.captureID = capID
 			self.choice = choice
 			self.iterate()
@@ -172,30 +254,95 @@ class MediaBar(wx.Panel):
 		wx.Panel.__init__(self, parent, size=size)
 		self.config = config
 		self.mediaFrame = mediaFrame
+		self.mediaLength = 0
+		self.width, self.height = self.GetSize()
+		self.slider = None
+
 		self.controlButton = None
+		self.forward = None
+		self.backward = None
 
 		self.initUI()
+
+	def onChange(self, event, track):
+		self.mediaFrame.cap.set(cv2.CAP_PROP_POS_FRAMES, track)
+		self.mediaFrame.SetFocus()
 
 	def initUI(self):
 		self.SetBackgroundColour(
 			"#4c4c4c" if self.config.loadedConfig["theme"] == "dark" else "white"
 		)
+		self.controlButton = wx.Button(self, label="Pause")
+		self.forward = wx.Button(self, label="forward")
+		self.backward = wx.Button(self, label="backward")
+		self.slider = wx.Slider(
+			self,
+			minValue=0,
+			maxValue=0,  # set max value in mediaFrame when video is loaded
+			style=wx.SL_HORIZONTAL,
+			size=(self.width * 0.75, self.height)
+		)
 
 		hbox = wx.BoxSizer(wx.HORIZONTAL)
-		self.controlButton = wx.Button(self, label="Pause")
-		hbox.Add(self.controlButton)
+		hbox.Add(self.slider, flag=wx.ALIGN_LEFT | wx.ALL)
+		hbox.AddSpacer(5)
+		hbox.Add(self.backward, flag=wx.ALIGN_RIGHT | wx.ALL)
+		hbox.AddSpacer(3)
+		hbox.Add(self.controlButton, flag=wx.ALL | wx.ALIGN_RIGHT)
+		hbox.AddSpacer(3)
+		hbox.Add(self.forward, flag=wx.ALIGN_RIGHT | wx.ALL)
+		self.SetSizer(hbox)
 
-		self.controlButton.Bind(wx.EVT_BUTTON, self.onKey)
+		# key event binding
+		self.forward.Bind(wx.EVT_BUTTON, self.onForward)
+		self.backward.Bind(wx.EVT_BUTTON, self.onBackward)
+		# forward & backword in button --> move 150 frame
+		self.controlButton.Bind(wx.EVT_BUTTON, self.onKeyBtn)
 
-	def onKey(self, event):
-		self.mediaFrame.control = not self.mediaFrame.control
-		# pause or play check based on self.control
-		if not self.mediaFrame.control:
-			self.mediaFrame.timer.Stop()
-			self.controlButton.SetLabel("Play")
-		else:
+		# binding slider event when capture is not None
+
+	def onTimer(self):
+		self.slider.SetValue(self.slider.GetValue() + 1)
+
+	def disableBtn(self):
+		self.forward.Disable()
+		self.backward.Disable()
+
+	def enableBtn(self):
+		self.forward.Enable()
+		self.backward.Enable()
+
+	# key event button
+	def onForward(self, event):
+		if self.mediaFrame.choice == self.mediaFrame.type["video"]:
+			self.slider.SetValue(self.slider.GetValue() + self.mediaFrame.fps * 5)
+			self.mediaFrame.cap.set(cv2.CAP_PROP_POS_FRAMES, self.slider.GetValue())
+
+	def onBackward(self, event):
+		if self.mediaFrame.choice == self.mediaFrame.type["video"]:
+			self.slider.SetValue(self.slider.GetValue() - self.mediaFrame.fps * 5)
+			self.mediaFrame.cap.set(cv2.CAP_PROP_POS_FRAMES, self.slider.GetValue())
+
+	def onKeyBtn(self, event):
+		if self.mediaFrame.choice == self.mediaFrame.type["video"] and \
+			self.controlButton.GetLabel() == "Play" and \
+			self.slider.GetValue() == self.slider.GetMax():
+			self.slider.SetValue(0)
 			self.mediaFrame.timer.Start(1000. / self.mediaFrame.fps)
+			# self.mediaFrame.control = True
 			self.controlButton.SetLabel("Pause")
+			self.mediaFrame.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+			self.mediaFrame.control = not self.mediaFrame.control
+
+		else:
+			# pause or play check based on self.control
+			if self.mediaFrame.control:
+				self.mediaFrame.timer.Stop()
+				self.controlButton.SetLabel("Play")
+			else:
+				self.mediaFrame.timer.Start(1000. / self.mediaFrame.fps)
+				self.controlButton.SetLabel("Pause")
+			self.mediaFrame.control = not self.mediaFrame.control
 
 class MediaPanel(wx.Panel):
 	def __init__(self, parent, size, config):

@@ -8,7 +8,7 @@ class Config:
 		temp = list()
 		self.loadedConfig = {
 			"language": "eng",
-			"fontSize": 14,
+			"fontSize": 17,
 			"theme": "dark",
 			"recent": temp
 		}
@@ -45,4 +45,5 @@ class Config:
 			print("Error occurred")
 
 	def storePath(self, path):
-		self.loadedConfig["recent"].append(path)
+		if path not in self.loadedConfig["recent"]:
+			self.loadedConfig["recent"].append(path)
