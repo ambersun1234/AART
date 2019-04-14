@@ -13,7 +13,7 @@ class SelectDeviceDialog(wx.Dialog):
 		self.deviceID = -1
 		self.deviceCheck, self.device = DeviceCheck.deviceQuery()
 		self.config = config
-		self.config.loadedConfig["fontSize"] -= 5
+		self.customSize = self.config.loadedConfig["fontSize"] - 5
 
 		# no available web camera device found on current pc
 		if self.deviceCheck:
@@ -64,7 +64,7 @@ class SelectDeviceDialog(wx.Dialog):
 			style=wx.ALIGN_CENTER | wx.CENTER
 		)
 		temp.SetFont(wx.Font(
-			self.config.loadedConfig["fontSize"],
+			self.customSize,
 			family=wx.DEFAULT,
 			style=wx.NORMAL,
 			weight=wx.NORMAL)
@@ -72,7 +72,7 @@ class SelectDeviceDialog(wx.Dialog):
 		sbs.Add(temp)
 		closeButton = wx.Button(self, label='Ok')
 		closeButton.SetFont(wx.Font(
-			self.config.loadedConfig["fontSize"],
+			self.customSize,
 			family=wx.DEFAULT,
 			style=wx.NORMAL,
 			weight=wx.NORMAL)
@@ -119,7 +119,7 @@ class SelectDeviceDialog(wx.Dialog):
 				self.deviceID_t = int(value)
 			temp = wx.RadioButton(pnl, label=key)
 			temp.SetFont(wx.Font(
-				self.config.loadedConfig["fontSize"],
+				self.customSize,
 				family=wx.DEFAULT,
 				style=wx.NORMAL,
 				weight=wx.NORMAL)
@@ -131,13 +131,13 @@ class SelectDeviceDialog(wx.Dialog):
 		okButton = wx.Button(self, label='Ok')
 		closeButton = wx.Button(self, label='Close')
 		okButton.SetFont(wx.Font(
-			self.config.loadedConfig["fontSize"],
+			self.customSize,
 			family=wx.DEFAULT,
 			style=wx.NORMAL,
 			weight=wx.NORMAL)
 		)
 		closeButton.SetFont(wx.Font(
-			self.config.loadedConfig["fontSize"],
+			self.customSize,
 			family=wx.DEFAULT,
 			style=wx.NORMAL,
 			weight=wx.NORMAL)
