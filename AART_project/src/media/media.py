@@ -83,11 +83,6 @@ class MediaFrame(wx.Panel):
 	def getNext(self, event):
 		# binding mediaBar slider event
 		if self.choice == self.type["video"]:
-			self.mediaBar.slider.Bind(
-				wx.EVT_SLIDER,
-				lambda event, val=self.mediaBar.slider.GetValue():
-				self.mediaBar.onChange(event, val)
-			)
 			self.cap.set(cv2.CAP_PROP_POS_FRAMES, self.mediaBar.slider.GetValue())
 
 		if self.choice == self.type["video"] and \
@@ -264,7 +259,8 @@ class MediaBar(wx.Panel):
 
 		self.initUI()
 
-	def onChange(self, event, track):
+	def onChange(self, event):
+		track = self.slider.GetValue()
 		self.mediaFrame.cap.set(cv2.CAP_PROP_POS_FRAMES, track)
 		self.mediaFrame.SetFocus()
 
@@ -299,7 +295,10 @@ class MediaBar(wx.Panel):
 		# forward & backword in button --> move 150 frame
 		self.controlButton.Bind(wx.EVT_BUTTON, self.onKeyBtn)
 
-		# binding slider event when capture is not None
+		self.slider.Bind(
+			wx.EVT_SLIDER,
+			self.onChange
+		)
 
 	def onTimer(self):
 		self.slider.SetValue(self.slider.GetValue() + 1)

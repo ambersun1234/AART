@@ -7,7 +7,7 @@ class Config:
 
 		temp = list()
 		self.loadedConfig = {
-			"language": "eng",
+			"language": "en",
 			"fontSize": 17,
 			"theme": "dark",
 			"recent": temp
