@@ -1,6 +1,15 @@
 import os
 import json
 
+import gettext
+t = gettext.translation(
+	"base",
+	localedir=".",
+	languages=["tw"]
+)
+t.install()
+_ = t.gettext()
+
 class Config:
 	def __init__(self, path):
 		self.path = "{}/config.json".format(os.path.dirname(path))
@@ -25,7 +34,7 @@ class Config:
 						self.loadedConfig[element] = data[element]
 
 			except FileNotFoundError as e:
-				print("config file not found")
+				print(_("config file not found"))
 		else:
 			# config.json not found
 			# write default config settings to .json file
@@ -34,7 +43,7 @@ class Config:
 					json.dump(self.loadedConfig, file)
 
 			except FileNotFoundError as e:
-				print("Error occurred")
+				print(_("Error occurred"))
 
 	def save(self):
 		try:
@@ -42,7 +51,7 @@ class Config:
 				json.dump(self.loadedConfig, file)
 
 		except FileNotFoundError as e:
-			print("Error occurred")
+			print(_("Error occurred"))
 
 	def storePath(self, path):
 		if path not in self.loadedConfig["recent"]:

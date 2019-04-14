@@ -5,6 +5,15 @@ import os
 
 from src.media.media import PreviewCamera
 
+import gettext
+t = gettext.translation(
+	"base",
+	localedir=".",
+	languages=["tw"]
+)
+t.install()
+_ = t.gettext()
+
 class SelectDeviceDialog(wx.Dialog):
 	def __init__(self, *args, config, **kwargs):
 		super(SelectDeviceDialog, self).__init__(*args, **kwargs)
@@ -54,13 +63,13 @@ class SelectDeviceDialog(wx.Dialog):
 		sbs = wx.StaticBoxSizer(
 			wx.StaticBox(
 				pnl,
-				label='Select web cameras'
+				label=_('Select web cameras')
 			),
 			orient=wx.VERTICAL
 		)
 		temp = wx.StaticText(
 			self,
-			label="No available web camera device on current pc",
+			label=_("No available web camera device on current pc"),
 			style=wx.ALIGN_CENTER | wx.CENTER
 		)
 		temp.SetFont(wx.Font(
@@ -70,7 +79,7 @@ class SelectDeviceDialog(wx.Dialog):
 			weight=wx.NORMAL)
 		)
 		sbs.Add(temp)
-		closeButton = wx.Button(self, label='Ok')
+		closeButton = wx.Button(self, label=_('Ok'))
 		closeButton.SetFont(wx.Font(
 			self.customSize,
 			family=wx.DEFAULT,
@@ -107,7 +116,7 @@ class SelectDeviceDialog(wx.Dialog):
 		sbs = wx.StaticBoxSizer(
 			wx.StaticBox(
 				pnl,
-				label='Select web cameras'
+				label=_('Select web cameras')
 			),
 			orient=wx.VERTICAL
 		)
@@ -128,8 +137,8 @@ class SelectDeviceDialog(wx.Dialog):
 			count += 1
 		self.preview = PreviewCamera(self, self.deviceID_t)
 
-		okButton = wx.Button(self, label='Ok')
-		closeButton = wx.Button(self, label='Close')
+		okButton = wx.Button(self, label=_('Ok'))
+		closeButton = wx.Button(self, label=_('Close'))
 		okButton.SetFont(wx.Font(
 			self.customSize,
 			family=wx.DEFAULT,

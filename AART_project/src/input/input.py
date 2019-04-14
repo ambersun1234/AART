@@ -1,5 +1,14 @@
 import wx
 
+import gettext
+t = gettext.translation(
+	"base",
+	localedir=".",
+	languages=["tw"]
+)
+t.install()
+_ = t.gettext()
+
 class InputPanel(wx.Panel):
 	def __init__(self, parent, size, config):
 		wx.Panel.__init__(self, parent, size=size)
@@ -23,7 +32,7 @@ class InputPanel(wx.Panel):
 		hbox2 = wx.BoxSizer(wx.HORIZONTAL)
 		hbox3 = wx.BoxSizer(wx.HORIZONTAL)
 
-		title = wx.StaticText(self, label=" Athlete trace: ")
+		title = wx.StaticText(self, label=_(" Athlete trace: "))
 		title.SetForegroundColour(
 			"white" if self.config.loadedConfig["theme"] == "dark" else "black"
 		)
@@ -42,7 +51,7 @@ class InputPanel(wx.Panel):
 
 		sta = list()
 		for index in range(1, 4):
-			sta.append(wx.StaticText(self, label="   person{}: ".format(index)))
+			sta.append(wx.StaticText(self, label="   Athlete{}: ".format(_(index))))
 
 		for element in sta:
 			element.SetForegroundColour(
@@ -69,7 +78,7 @@ class InputPanel(wx.Panel):
 			)
 
 			# button ok
-			ok = wx.Button(self, label="Ok", size=(60, 30))
+			ok = wx.Button(self, label=_("Ok"), size=(60, 30))
 			ok.SetForegroundColour("green")
 			box.Add(ok, flag=wx.ALL, border=5)
 			ok.Bind(
@@ -79,7 +88,7 @@ class InputPanel(wx.Panel):
 			)
 
 			# button close
-			close = wx.Button(self, label="Clear", size=(60, 30))
+			close = wx.Button(self, label=_("Clear"), size=(60, 30))
 			close.SetForegroundColour("red")
 			box.Add(close, flag=wx.ALL, border=5)
 			close.Bind(

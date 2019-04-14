@@ -2,6 +2,15 @@ import wx
 import wx.media
 import cv2
 
+import gettext
+t = gettext.translation(
+	"base",
+	localedir=".",
+	languages=["tw"]
+)
+t.install()
+_ = t.gettext()
+
 class PreviewCamera(wx.Panel):
 	def __init__(self, parent, deviceID):
 		wx.Panel.__init__(self, parent)
@@ -88,7 +97,7 @@ class MediaFrame(wx.Panel):
 		if self.choice == self.type["video"] and \
 			self.mediaBar.slider.GetValue() == self.mediaBar.slider.GetMax():
 			self.timer.Stop()
-			self.mediaBar.controlButton.SetLabel("Play")
+			self.mediaBar.controlButton.SetLabel(_("Play"))
 			# which means the video play to the end and stop
 
 		ret, frame = self.cap.read()
@@ -119,14 +128,14 @@ class MediaFrame(wx.Panel):
 		# opencv will force to stop the application cause MessageBox is not woking
 		if self.cap is None or not self.cap.isOpened():
 			if self.type == 0:
-				temp = "Unable to load webcam, it might be busy.\n"
-				"Try it again"
+				temp = _("Unable to load webcam, it might be busy.\n")
+				_("Try it again")
 			else:
-				temp = "Loading file failed, please check again"
+				temp = _("Loading file failed, please check again")
 
 			wx.MessageBox(
 				temp,
-				"ERROR",
+				_("ERROR"),
 				wx.ICON_ERROR | wx.OK
 			)
 		else:
@@ -171,20 +180,20 @@ class MediaFrame(wx.Panel):
 		if keycode == wx.WXK_SPACE or chr(keycode) == "k" or chr(keycode) == "K":
 			# pause or play check based on self.control
 			if self.choice == self.type["video"] and \
-				self.mediaBar.controlButton.GetLabel() == "Play" and \
+				self.mediaBar.controlButton.GetLabel() == _("Play") and \
 				self.mediaBar.slider.GetValue() == self.mediaBar.slider.GetMax():
 				self.mediaBar.slider.SetValue(0)
 				self.timer.Start(1000. / self.fps)
 				self.control = True
-				self.mediaBar.controlButton.SetLabel("Pause")
+				self.mediaBar.controlButton.SetLabel(_("Pause"))
 				self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 			else:
 				if self.control:
 					self.timer.Stop()
-					self.mediaBar.controlButton.SetLabel("Play")
+					self.mediaBar.controlButton.SetLabel(_("Play"))
 				else:
 					self.timer.Start(1000. / self.fps)
-					self.mediaBar.controlButton.SetLabel("Pause")
+					self.mediaBar.controlButton.SetLabel(_("Pause"))
 				self.control = not self.control
 
 		if self.choice == self.type["video"]:
@@ -223,7 +232,7 @@ class MediaFrame(wx.Panel):
 
 		self.mediaBar.slider.SetMin(0)
 		self.mediaBar.slider.SetValue(0)
-		self.mediaBar.controlButton.SetLabel("Pause")
+		self.mediaBar.controlButton.SetLabel(_("Pause"))
 		# reinitialize mediaFrame self variable
 		# since user may change webcam or video during broadcast
 
@@ -268,9 +277,9 @@ class MediaBar(wx.Panel):
 		self.SetBackgroundColour(
 			"#4c4c4c" if self.config.loadedConfig["theme"] == "dark" else "white"
 		)
-		self.controlButton = wx.Button(self, label="Pause")
-		self.forward = wx.Button(self, label="forward")
-		self.backward = wx.Button(self, label="backward")
+		self.controlButton = wx.Button(self, label=_("Pause"))
+		self.forward = wx.Button(self, label=_("forward"))
+		self.backward = wx.Button(self, label=_("backward"))
 		self.slider = wx.Slider(
 			self,
 			minValue=0,
@@ -324,12 +333,12 @@ class MediaBar(wx.Panel):
 
 	def onKeyBtn(self, event):
 		if self.mediaFrame.choice == self.mediaFrame.type["video"] and \
-			self.controlButton.GetLabel() == "Play" and \
+			self.controlButton.GetLabel() == _("Play") and \
 			self.slider.GetValue() == self.slider.GetMax():
 			self.slider.SetValue(0)
 			self.mediaFrame.timer.Start(1000. / self.mediaFrame.fps)
 			# self.mediaFrame.control = True
-			self.controlButton.SetLabel("Pause")
+			self.controlButton.SetLabel(_("Pause"))
 			self.mediaFrame.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 			self.mediaFrame.control = not self.mediaFrame.control
 
@@ -337,10 +346,10 @@ class MediaBar(wx.Panel):
 			# pause or play check based on self.control
 			if self.mediaFrame.control:
 				self.mediaFrame.timer.Stop()
-				self.controlButton.SetLabel("Play")
+				self.controlButton.SetLabel(_("Play"))
 			else:
 				self.mediaFrame.timer.Start(1000. / self.mediaFrame.fps)
-				self.controlButton.SetLabel("Pause")
+				self.controlButton.SetLabel(_("Pause"))
 			self.mediaFrame.control = not self.mediaFrame.control
 
 class MediaPanel(wx.Panel):

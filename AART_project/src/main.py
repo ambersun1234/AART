@@ -10,6 +10,15 @@ from src.output.output import OutputTextPanel, OutputPicPanel
 from src.welcome.welcome import WelcomeGuide
 from src.config.configJSON import Config
 
+import gettext
+t = gettext.translation(
+	"base",
+	localedir=".",
+	languages=["tw"]
+)
+t.install()
+_ = t.gettext()
+
 class Frame(wx.Frame):
 	def __init__(self, parent, title):
 		super(Frame, self).__init__(parent, title=title)
@@ -55,7 +64,7 @@ class Frame(wx.Frame):
 
 		self.welcome = WelcomeGuide(
 			self,
-			title="Welcome to AART",
+			title=_("Welcome to AART"),
 			size=(self.currentScreenX * 0.5, self.currentScreenY * 0.5),
 			path=os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
 			config=self.config
@@ -129,17 +138,19 @@ class Frame(wx.Frame):
 		fileMenu = wx.Menu()
 
 		op = wx.Menu()
-		op.Append(11, "&Select camera\tCtrl+c", "Select camera")
-		op.Append(wx.ID_OPEN, "&Select Video", "Select video")
-		fileMenu.Append(wx.ID_ANY, "&Open", op)
-		fileMenu.Append(wx.ID_EXIT, "&Quit", "Quit application")
-		fileMenu.Append(-1, "&Restart\tCtrl+r", "Restart program")
+		op.Append(11, _("&Select camera\tCtrl+c"), _("Select camera"))
+		op.Append(wx.ID_OPEN, _("&Select Video"), _("Select video"))
+		op2 = wx.Menu()
+		op2.Append(12, _("&Traditional Chinese"), _("Traditional Chinese"))
+		op2.Append(13, _("&English"), _("English"))
+		fileMenu.Append(wx.ID_ANY, _("&Open"), op)
+		fileMenu.Append(21, _("&Choose language"), op2)
+		fileMenu.Append(wx.ID_EXIT, _("&Quit"), _("Quit application"))
 
-		menuBar.Append(fileMenu, "&File")
+		menuBar.Append(fileMenu, _("&File"))
 		self.SetMenuBar(menuBar)
 
 		self.Bind(wx.EVT_MENU, self.onQuit, id=wx.ID_EXIT)
-		self.Bind(wx.EVT_MENU, self.onRestart, id=-1)
 		self.Bind(wx.EVT_MENU, self.onOpenVideo, id=wx.ID_OPEN)
 		self.Bind(wx.EVT_MENU, self.onSelectCamera, id=11)
 
@@ -150,7 +161,7 @@ class Frame(wx.Frame):
 	def onSelectCamera(self, event):
 		dialog = SelectDeviceDialog(
 			None,
-			title="Select web camera",
+			title=_("Select web camera"),
 			config=self.config
 		)
 		dialog.ShowModal()
@@ -160,8 +171,8 @@ class Frame(wx.Frame):
 	def onOpenVideo(self, event):
 		dialog = wx.FileDialog(
 			self,
-			message="Choose a file",
-			wildcard="Video files(*.mp4;*.avi)|*.mp4;*.avi",
+			message=_("Choose a file"),
+			wildcard=_("Video files(*.mp4;*.avi)|*.mp4;*.avi"),
 			defaultFile="",
 			style=wx.FD_OPEN | wx.FD_CHANGE_DIR
 		)
@@ -181,6 +192,6 @@ if __name__ == '__main__':
 	app = wx.App()
 	frame = Frame(
 		None,
-		title="Athlete Analysis of Real Time Sports Events( AART )"
+		title=_("Athlete Analysis of Real Time Sports Events( AART )")
 	)
 	app.MainLoop()

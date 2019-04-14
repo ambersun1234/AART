@@ -1,6 +1,15 @@
 import wx
 import wx.lib.scrolledpanel as scrolled
 
+import gettext
+t = gettext.translation(
+	"base",
+	localedir=".",
+	languages=["tw"]
+)
+t.install()
+_ = t.gettext()
+
 class OutputTextPanel(wx.Panel):
 	def __init__(self, parent, size, config):
 		wx.Panel.__init__(self, parent, size=size)
@@ -44,7 +53,7 @@ class OutputTextPanel(wx.Panel):
 
 		self.sp = scrolled.ScrolledPanel(
 			self,
-			name="out",
+			name=_("out"),
 			size=self.GetSize(),
 			style=wx.TAB_TRAVERSAL | wx.SUNKEN_BORDER
 		)
@@ -52,7 +61,7 @@ class OutputTextPanel(wx.Panel):
 		vbox = wx.BoxSizer(wx.VERTICAL)
 		spbox = wx.BoxSizer(wx.VERTICAL)
 
-		title = wx.StaticText(self, label=" Athlete action: ")
+		title = wx.StaticText(self, label=_(" Athlete action: "))
 		title.SetForegroundColour(
 			"white" if self.config.loadedConfig["theme"] == "dark" else "black"
 		)
@@ -76,7 +85,7 @@ class OutputTextPanel(wx.Panel):
 
 		check = False
 		for key, value in self.text.items():
-			temp = wx.StaticText(self.sp, label="   {}: {}".format(key, value))
+			temp = wx.StaticText(self.sp, label="   {}: {}".format(_(key), _(value)))
 			temp.SetForegroundColour(
 				"white" if self.config.loadedConfig["theme"] == "dark" else "black"
 			)
@@ -114,7 +123,7 @@ class OutputPicPanel(wx.Panel):
 
 		self.sp = scrolled.ScrolledPanel(
 			self,
-			name="out",
+			name=_("out"),
 			size=self.GetSize(),
 			style=wx.TAB_TRAVERSAL | wx.SUNKEN_BORDER
 		)
@@ -122,7 +131,7 @@ class OutputPicPanel(wx.Panel):
 		vbox = wx.BoxSizer(wx.VERTICAL)
 		spbox = wx.BoxSizer(wx.HORIZONTAL)
 
-		title = wx.StaticText(self, label=" Athlete picture")
+		title = wx.StaticText(self, label=_(" Athlete picture"))
 		title.SetForegroundColour(
 			"white" if self.config.loadedConfig["theme"] == "dark" else "black"
 		)

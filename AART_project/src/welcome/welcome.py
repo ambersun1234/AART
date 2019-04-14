@@ -3,6 +3,15 @@ import wx.lib.scrolledpanel as scrolled
 import wx.lib.stattext as st
 import os
 
+import gettext
+t = gettext.translation(
+	"base",
+	localedir=".",
+	languages=["tw"]
+)
+t.install()
+_ = t.gettext()
+
 class WelcomeGuide(wx.Dialog):
 	def __init__(self, *args, path, config, **kwargs):
 		super(WelcomeGuide, self).__init__(*args, **kwargs)
@@ -106,7 +115,7 @@ class WelcomeGuide(wx.Dialog):
 				spBox.Add(tvbox, flag=wx.EXPAND)
 		else:
 			# no recent files
-			text = wx.StaticText(self.sp, label="   No recent files")
+			text = wx.StaticText(self.sp, label=_("   No recent files"))
 			if self.config.loadedConfig["theme"] == "dark":
 				text.SetForegroundColour("white")
 			else:
@@ -149,8 +158,8 @@ class WelcomeGuide(wx.Dialog):
 	def onClick(self, event, path):
 		if not os.path.exists(path):
 			wx.MessageBox(
-				"File not found.",
-				"ERROR",
+				_("File not found."),
+				_("ERROR"),
 				wx.ICON_ERROR | wx.OK
 			)
 		else:
@@ -162,7 +171,7 @@ class WelcomeGuide(wx.Dialog):
 		temp = scrolled.ScrolledPanel(
 			self,
 			size=(width - height, height),
-			name="Recent file",
+			name=_("Recent file"),
 			style=wx.TAB_TRAVERSAL | wx.SUNKEN_BORDER
 		)
 		return temp
