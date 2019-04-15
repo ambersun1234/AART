@@ -6,11 +6,11 @@ import os
 import gettext
 t = gettext.translation(
 	"base",
-	localedir=".",
+	localedir="./locales",
 	languages=["tw"]
 )
 t.install()
-_ = t.gettext()
+_ = t.gettext
 
 class WelcomeGuide(wx.Dialog):
 	def __init__(self, *args, path, config, **kwargs):

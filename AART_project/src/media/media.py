@@ -5,11 +5,11 @@ import cv2
 import gettext
 t = gettext.translation(
 	"base",
-	localedir=".",
+	localedir="./locales",
 	languages=["tw"]
 )
 t.install()
-_ = t.gettext()
+_ = t.gettext
 
 class PreviewCamera(wx.Panel):
 	def __init__(self, parent, deviceID):

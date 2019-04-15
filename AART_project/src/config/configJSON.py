@@ -4,11 +4,11 @@ import json
 import gettext
 t = gettext.translation(
 	"base",
-	localedir=".",
+	localedir="./locales",
 	languages=["tw"]
 )
 t.install()
-_ = t.gettext()
+_ = t.gettext
 
 class Config:
 	def __init__(self, path):

@@ -4,11 +4,11 @@ import wx.lib.scrolledpanel as scrolled
 import gettext
 t = gettext.translation(
 	"base",
-	localedir=".",
+	localedir="./locales",
 	languages=["tw"]
 )
 t.install()
-_ = t.gettext()
+_ = t.gettext
 
 class OutputTextPanel(wx.Panel):
 	def __init__(self, parent, size, config):
@@ -85,7 +85,8 @@ class OutputTextPanel(wx.Panel):
 
 		check = False
 		for key, value in self.text.items():
-			temp = wx.StaticText(self.sp, label="   {}: {}".format(_(key), _(value)))
+			# temp = wx.StaticText(self.sp, label="   {}: {}".format(_(key), _(value)))
+			temp = wx.StaticText(self.sp, label="   {}: {}".format(key, value))
 			temp.SetForegroundColour(
 				"white" if self.config.loadedConfig["theme"] == "dark" else "black"
 			)

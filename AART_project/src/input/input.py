@@ -3,11 +3,11 @@ import wx
 import gettext
 t = gettext.translation(
 	"base",
-	localedir=".",
+	localedir="./locales",
 	languages=["tw"]
 )
 t.install()
-_ = t.gettext()
+_ = t.gettext
 
 class InputPanel(wx.Panel):
 	def __init__(self, parent, size, config):
@@ -51,7 +51,12 @@ class InputPanel(wx.Panel):
 
 		sta = list()
 		for index in range(1, 4):
-			sta.append(wx.StaticText(self, label="   Athlete{}: ".format(_(index))))
+			sta.append(
+				wx.StaticText(
+					self,
+					label="   {}{}: ".format(_("Athlete"), index)
+				)
+			)
 
 		for element in sta:
 			element.SetForegroundColour(
