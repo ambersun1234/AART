@@ -8,32 +8,32 @@ class OutputTextPanel(wx.Panel):
 		wx.Panel.__init__(self, parent, size=size)
 
 		self.text = {
-			"person1": "pitch",
-			"person2": "layup",
-			"person3": "dreaming",
-			"person4": "dreaming",
-			"person5": "dreaming",
-			"person6": "dreaming",
-			"person7": "dreaming",
-			"person8": "dreaming",
-			"person9": "dreaming",
-			"person10": "dreaming",
-			"person11": "dreaming",
-			"person12": "dreaming",
-			"person13": "dreaming",
-			"person14": "dreaming",
-			"person15": "dreaming",
-			"person16": "dreaming",
-			"person17": "dreaming",
-			"person18": "dreaming",
-			"person19": "dreaming",
-			"person20": "dreaming",
-			"person21": "dreaming",
-			"person22": "dreaming",
-			"person23": "dreaming",
-			"person24": "dreaming",
-			"person25": "dreaming",
-			"person26": "lalaland"
+			"1": "dribbling",
+			"2": "layup",
+			"3": "shooting",
+			"4": "dribbling",
+			"5": "layup",
+			"6": "dribbling",
+			"7": "dribbling",
+			"8": "layup",
+			"9": "dribbling",
+			"10": "dribbling",
+			"11": "dribbling",
+			"12": "dribbling",
+			"13": "dribbling",
+			"14": "layup",
+			"15": "dribbling",
+			"16": "layup",
+			"17": "dribbling",
+			"18": "layup",
+			"19": "dribbling",
+			"20": "dribbling",
+			"21": "shooting",
+			"22": "dribbling",
+			"23": "shooting",
+			"24": "dribbling",
+			"25": "shooting",
+			"26": "dribbling"
 		}
 		self.config = config
 		self.sp = None
@@ -90,8 +90,11 @@ class OutputTextPanel(wx.Panel):
 
 		check = False
 		for key, value in self.text.items():
-			# temp = wx.StaticText(self.sp, label="   {}: {}".format(_(key), _(value)))
-			temp = wx.StaticText(self.sp, label="   {}: {}".format(key, value))
+			temp = wx.StaticText(
+				self.sp,
+				label="   {} {}: {}".format(_("Athlete"), _(key), _(value)),
+				size=(-1, self.config.loadedConfig["fontSize"] + 17)
+			)
 			temp.SetForegroundColour(
 				"white" if self.config.loadedConfig["theme"] == "dark" else "black"
 			)
@@ -105,7 +108,7 @@ class OutputTextPanel(wx.Panel):
 				spbox.AddSpacer(5)
 			else:
 				check = True
-			spbox.Add(temp)
+			spbox.Add(temp, flag=wx.EXPAND | wx.ALL)
 
 		self.sp.SetSizer(spbox)
 		self.sp.SetAutoLayout(1)

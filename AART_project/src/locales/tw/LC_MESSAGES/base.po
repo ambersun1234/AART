@@ -14,6 +14,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
 
+#: AART_project/src/output/output.py:97
+msgid "dribbling"
+msgstr "運球"
+
+#: AART_project/src/output/output.py:97
+msgid "layup"
+msgstr "上籃"
+
+#: AART_project/src/output/output.py:97
+msgid "shooting"
+msgstr "投籃"
 
 #: AART_project/src/config/configJSON.py:37
 msgid "config file not found"
@@ -99,7 +110,7 @@ msgstr "&選擇語言"
 
 #: AART_project/src/main.py:148
 msgid "&Quit"
-msgstr "退出"
+msgstr "&退出"
 
 #: AART_project/src/main.py:148
 msgid "Quit application"

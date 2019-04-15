@@ -20,5 +20,8 @@ tw = gettext.translation(
 tw.install()
 _ = tw.gettext
 
+note:
+same msgid will only effect one of it
+
 reference:
 https://medium.com/i18n-and-l10n-resources-for-developers/how-to-translate-python-applications-with-the-gnu-gettext-module-5c1c085041bd

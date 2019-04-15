@@ -147,23 +147,23 @@ class Frame(wx.Frame):
 		checkTw = "\u2714  " \
 			if self.config.loadedConfig["language"] == "tw" else "  "
 		checkEn = "\u2714  " \
-			if self.config.loadedConfig["language"] != "tw" else "  "
+			if not self.config.loadedConfig["language"] == "tw" else "  "
 
 		op = wx.Menu()
 		op.Append(11, _("&Select camera\tCtrl+c"), _("Select camera"))
-		op.Append(wx.ID_OPEN, _("&Select Video"), _("Select video"))
+		op.Append(14, _("&Select Video"), _("Select video"))
 		op2 = wx.Menu()
 		op2.Append(12, checkTw + _("&Traditional Chinese"), _("Traditional Chinese"))
 		op2.Append(13, checkEn + _("&English"), _("English"))
 		fileMenu.Append(wx.ID_ANY, _("&Open"), op)
 		fileMenu.Append(21, _("&Choose language"), op2)
-		fileMenu.Append(wx.ID_EXIT, _("&Quit"), _("Quit application"))
+		fileMenu.Append(33, _("&Quit"), _("Quit application"))
 
 		menuBar.Append(fileMenu, _("&File"))
 		self.SetMenuBar(menuBar)
 
-		self.Bind(wx.EVT_MENU, self.onQuit, id=wx.ID_EXIT)
-		self.Bind(wx.EVT_MENU, self.onOpenVideo, id=wx.ID_OPEN)
+		self.Bind(wx.EVT_MENU, self.onQuit, id=33)
+		self.Bind(wx.EVT_MENU, self.onOpenVideo, id=14)
 		self.Bind(wx.EVT_MENU, self.onSelectCamera, id=11)
 
 		# set language

@@ -329,11 +329,13 @@ class MediaBar(wx.Panel):
 		if self.mediaFrame.choice == self.mediaFrame.type["video"]:
 			self.slider.SetValue(self.slider.GetValue() + self.mediaFrame.fps * 5)
 			self.mediaFrame.cap.set(cv2.CAP_PROP_POS_FRAMES, self.slider.GetValue())
+		self.mediaFrame.SetFocus()
 
 	def onBackward(self, event):
 		if self.mediaFrame.choice == self.mediaFrame.type["video"]:
 			self.slider.SetValue(self.slider.GetValue() - self.mediaFrame.fps * 5)
 			self.mediaFrame.cap.set(cv2.CAP_PROP_POS_FRAMES, self.slider.GetValue())
+		self.mediaFrame.SetFocus()
 
 	def onKeyBtn(self, event):
 		if self.mediaFrame.choice == self.mediaFrame.type["video"] and \
@@ -355,6 +357,7 @@ class MediaBar(wx.Panel):
 				self.mediaFrame.timer.Start(1000. / self.mediaFrame.fps)
 				self.controlButton.SetLabel(_("Pause"))
 			self.mediaFrame.control = not self.mediaFrame.control
+		self.mediaFrame.SetFocus()
 
 class MediaPanel(wx.Panel):
 	def __init__(self, parent, size, config):
