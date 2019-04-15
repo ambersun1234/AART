@@ -11,22 +11,29 @@ from src.welcome.welcome import WelcomeGuide
 from src.config.configJSON import Config
 
 import gettext
-t = gettext.translation(
-	"base",
-	localedir="./locales",
-	languages=["tw"]
-)
-t.install()
-_ = t.gettext
 
 class Frame(wx.Frame):
-	def __init__(self, parent, title):
-		super(Frame, self).__init__(parent, title=title)
+	def __init__(self, parent):
+		super(Frame, self).__init__(parent)
 		self.currentScreenX = 0
 		self.currentScreenY = 0
 		self.initSize()
 
 		self.config = Config(os.path.abspath(__file__))
+
+		# set language
+		lang = "tw" if self.config.loadedConfig["language"] == "tw" else "en"
+		t = gettext.translation(
+			"base",
+			localedir="./locales",
+			languages=[lang]
+		)
+		t.install()
+		global _
+		_ = t.gettext
+
+		# set title
+		self.SetTitle(title=_("Athlete Analysis of Real Time Sports Events( AART )"))
 
 		self.mediaPanel = MediaPanel(
 			self,
@@ -137,12 +144,17 @@ class Frame(wx.Frame):
 		)
 		fileMenu = wx.Menu()
 
+		checkTw = "\u2714  " \
+			if self.config.loadedConfig["language"] == "tw" else "  "
+		checkEn = "\u2714  " \
+			if self.config.loadedConfig["language"] != "tw" else "  "
+
 		op = wx.Menu()
 		op.Append(11, _("&Select camera\tCtrl+c"), _("Select camera"))
 		op.Append(wx.ID_OPEN, _("&Select Video"), _("Select video"))
 		op2 = wx.Menu()
-		op2.Append(12, _("&Traditional Chinese"), _("Traditional Chinese"))
-		op2.Append(13, _("&English"), _("English"))
+		op2.Append(12, checkTw + _("&Traditional Chinese"), _("Traditional Chinese"))
+		op2.Append(13, checkEn + _("&English"), _("English"))
 		fileMenu.Append(wx.ID_ANY, _("&Open"), op)
 		fileMenu.Append(21, _("&Choose language"), op2)
 		fileMenu.Append(wx.ID_EXIT, _("&Quit"), _("Quit application"))
@@ -153,6 +165,25 @@ class Frame(wx.Frame):
 		self.Bind(wx.EVT_MENU, self.onQuit, id=wx.ID_EXIT)
 		self.Bind(wx.EVT_MENU, self.onOpenVideo, id=wx.ID_OPEN)
 		self.Bind(wx.EVT_MENU, self.onSelectCamera, id=11)
+
+		# set language
+		self.Bind(
+			wx.EVT_MENU,
+			lambda event,
+			lang="tw": self.onChangeLane(event, lang),
+			id=12
+		)  # traditional chinese
+		self.Bind(
+			wx.EVT_MENU,
+			lambda event,
+			lang="en": self.onChangeLane(event, lang),
+			id=13
+		)  # english
+
+	def onChangeLane(self, event, lang):
+		self.config.storeLang(lang)
+		self.config.save()
+		self.onRestart(event)
 
 	def onRestart(self, event):
 		# restart program
@@ -190,8 +221,5 @@ class Frame(wx.Frame):
 
 if __name__ == '__main__':
 	app = wx.App()
-	frame = Frame(
-		None,
-		title=_("Athlete Analysis of Real Time Sports Events( AART )")
-	)
+	frame = Frame(None)
 	app.MainLoop()

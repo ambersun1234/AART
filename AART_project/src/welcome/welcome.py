@@ -4,13 +4,6 @@ import wx.lib.stattext as st
 import os
 
 import gettext
-t = gettext.translation(
-	"base",
-	localedir="./locales",
-	languages=["tw"]
-)
-t.install()
-_ = t.gettext
 
 class WelcomeGuide(wx.Dialog):
 	def __init__(self, *args, path, config, **kwargs):
@@ -21,6 +14,17 @@ class WelcomeGuide(wx.Dialog):
 		self.sp = None
 		self.config = config
 		self.path = ""
+
+		# set language
+		lang = "tw" if self.config.loadedConfig["language"] == "tw" else "en"
+		t = gettext.translation(
+			"base",
+			localedir="./locales",
+			languages=[lang]
+		)
+		t.install()
+		global _
+		_ = t.gettext
 
 		self.initUI()
 		self.Show()

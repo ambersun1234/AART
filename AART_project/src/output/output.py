@@ -2,13 +2,6 @@ import wx
 import wx.lib.scrolledpanel as scrolled
 
 import gettext
-t = gettext.translation(
-	"base",
-	localedir="./locales",
-	languages=["tw"]
-)
-t.install()
-_ = t.gettext
 
 class OutputTextPanel(wx.Panel):
 	def __init__(self, parent, size, config):
@@ -44,6 +37,18 @@ class OutputTextPanel(wx.Panel):
 		}
 		self.config = config
 		self.sp = None
+
+		# set language
+		lang = "tw" if self.config.loadedConfig["language"] == "tw" else "en"
+		t = gettext.translation(
+			"base",
+			localedir="./locales",
+			languages=[lang]
+		)
+		t.install()
+		global _
+		_ = t.gettext
+
 		self.initUI()
 
 	def initUI(self):
@@ -115,6 +120,18 @@ class OutputPicPanel(wx.Panel):
 		wx.Panel.__init__(self, parent, size=size)
 		self.config = config
 		self.sp = None
+
+		# set language
+		lang = "tw" if self.config.loadedConfig["language"] == "tw" else "en"
+		t = gettext.translation(
+			"base",
+			localedir="./locales",
+			languages=[lang]
+		)
+		t.install()
+		global _
+		_ = t.gettext
+
 		self.initUI()
 
 	def initUI(self):

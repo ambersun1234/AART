@@ -3,13 +3,6 @@ import wx.media
 import cv2
 
 import gettext
-t = gettext.translation(
-	"base",
-	localedir="./locales",
-	languages=["tw"]
-)
-t.install()
-_ = t.gettext
 
 class PreviewCamera(wx.Panel):
 	def __init__(self, parent, deviceID):
@@ -68,6 +61,17 @@ class MediaFrame(wx.Panel):
 		self.cap = None
 		self.videoPath = ""
 		self.type = {"webcam": 0, "video": 1}
+
+		# set language
+		lang = "tw" if self.config.loadedConfig["language"] == "tw" else "en"
+		t = gettext.translation(
+			"base",
+			localedir="./locales",
+			languages=[lang]
+		)
+		t.install()
+		global _
+		_ = t.gettext
 
 		# set playing speed
 		self.fps = 30

@@ -6,13 +6,6 @@ import os
 from src.media.media import PreviewCamera
 
 import gettext
-t = gettext.translation(
-	"base",
-	localedir="./locales",
-	languages=["tw"]
-)
-t.install()
-_ = t.gettext
 
 class SelectDeviceDialog(wx.Dialog):
 	def __init__(self, *args, config, **kwargs):
@@ -23,6 +16,17 @@ class SelectDeviceDialog(wx.Dialog):
 		self.deviceCheck, self.device = DeviceCheck.deviceQuery()
 		self.config = config
 		self.customSize = self.config.loadedConfig["fontSize"] - 5
+
+		# set language
+		lang = "tw" if self.config.loadedConfig["language"] == "tw" else "en"
+		t = gettext.translation(
+			"base",
+			localedir="./locales",
+			languages=[lang]
+		)
+		t.install()
+		global _
+		_ = t.gettext
 
 		# no available web camera device found on current pc
 		if self.deviceCheck:

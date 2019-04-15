@@ -1,13 +1,6 @@
 import wx
 
 import gettext
-t = gettext.translation(
-	"base",
-	localedir="./locales",
-	languages=["tw"]
-)
-t.install()
-_ = t.gettext
 
 class InputPanel(wx.Panel):
 	def __init__(self, parent, size, config):
@@ -22,6 +15,17 @@ class InputPanel(wx.Panel):
 		self.config = config
 		self.input = dict()
 		# store user input
+
+		# set language
+		lang = "tw" if self.config.loadedConfig["language"] == "tw" else "en"
+		t = gettext.translation(
+			"base",
+			localedir="./locales",
+			languages=[lang]
+		)
+		t.install()
+		global _
+		_ = t.gettext
 
 		self.initUI()
 

@@ -2,13 +2,6 @@ import os
 import json
 
 import gettext
-t = gettext.translation(
-	"base",
-	localedir="./locales",
-	languages=["tw"]
-)
-t.install()
-_ = t.gettext
 
 class Config:
 	def __init__(self, path):
@@ -21,6 +14,17 @@ class Config:
 			"theme": "dark",
 			"recent": temp
 		}
+
+		# set language
+		lang = "tw" if self.loadedConfig["language"] == "tw" else "en"
+		t = gettext.translation(
+			"base",
+			localedir="./locales",
+			languages=[lang]
+		)
+		t.install()
+		global _
+		_ = t.gettext
 
 		self.load()
 
@@ -52,6 +56,9 @@ class Config:
 
 		except FileNotFoundError as e:
 			print(_("Error occurred"))
+
+	def storeLang(self, lang):
+		self.loadedConfig["language"] = lang
 
 	def storePath(self, path):
 		if path not in self.loadedConfig["recent"]:
