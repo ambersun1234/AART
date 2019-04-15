@@ -9,7 +9,7 @@ class WelcomeGuide(wx.Dialog):
 	def __init__(self, *args, path, config, **kwargs):
 		super(WelcomeGuide, self).__init__(*args, **kwargs)
 
-		self.logo = wx.Image("{}/logo.png".format(os.path.dirname(path)))
+		self.logo = None
 		self.bmp = None
 		self.sp = None
 		self.config = config
@@ -26,6 +26,7 @@ class WelcomeGuide(wx.Dialog):
 		global _
 		_ = t.gettext
 
+		self.logo = wx.Image("{}/logo{}.png".format(os.path.dirname(path), lang))
 		self.initUI()
 		self.Show()
 
