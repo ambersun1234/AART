@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2019-04-15 10:58+0800\n"
+"POT-Creation-Date: 2019-04-15 11:29+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,172 +17,171 @@ msgstr ""
 
 #: AART_project/src/config/configJSON.py:37
 msgid "config file not found"
-msgstr ""
+msgstr "config file not found"
 
 #: AART_project/src/config/configJSON.py:46
 #: AART_project/src/config/configJSON.py:54
 msgid "Error occurred"
-msgstr ""
+msgstr "Error occurred"
 
 #: AART_project/src/device/device.py:66 AART_project/src/device/device.py:119
 msgid "Select web cameras"
-msgstr ""
+msgstr "Select web cameras"
 
 #: AART_project/src/device/device.py:72
 msgid "No available web camera device on current pc"
-msgstr ""
+msgstr "No available web camera device on current pc"
 
 #: AART_project/src/device/device.py:82 AART_project/src/device/device.py:140
-#: AART_project/src/input/input.py:81
+#: AART_project/src/input/input.py:86
 msgid "Ok"
-msgstr ""
+msgstr "Ok"
 
 #: AART_project/src/device/device.py:141
 msgid "Close"
-msgstr ""
+msgstr "Close"
 
 #: AART_project/src/input/input.py:35
 msgid " Athlete trace: "
-msgstr ""
+msgstr " Athlete trace: "
 
-#: AART_project/src/input/input.py:54
+#: AART_project/src/input/input.py:57
 msgid "Athlete"
-msgstr ""
+msgstr "Athlete"
 
-#: AART_project/src/input/input.py:91
+#: AART_project/src/input/input.py:96
 msgid "Clear"
-msgstr ""
+msgstr "Clear"
 
 #: AART_project/src/main.py:67
 msgid "Welcome to AART"
-msgstr ""
+msgstr "Welcome to AART"
 
 #: AART_project/src/main.py:141
 msgid "&Select camera\tCtrl+c"
-msgstr ""
+msgstr "&Select camera\tCtrl+c"
 
 #: AART_project/src/main.py:141
 msgid "Select camera"
-msgstr ""
+msgstr "Select camera"
 
 #: AART_project/src/main.py:142
 msgid "&Select Video"
-msgstr ""
+msgstr "&Select Video"
 
 #: AART_project/src/main.py:142
 msgid "Select video"
-msgstr ""
+msgstr "Select video"
 
 #: AART_project/src/main.py:144
 msgid "&Traditional Chinese"
-msgstr ""
+msgstr "&Traditional Chinese"
 
 #: AART_project/src/main.py:144
 msgid "Traditional Chinese"
-msgstr ""
+msgstr "Traditional Chinese"
 
 #: AART_project/src/main.py:145
 msgid "&English"
-msgstr ""
+msgstr "&English"
 
 #: AART_project/src/main.py:145
 msgid "English"
-msgstr ""
+msgstr "English"
 
 #: AART_project/src/main.py:146
 msgid "&Open"
-msgstr ""
+msgstr "&Open"
 
 #: AART_project/src/main.py:147
 msgid "&Choose language"
-msgstr ""
+msgstr "&Choose language"
 
 #: AART_project/src/main.py:148
 msgid "&Quit"
-msgstr ""
+msgstr "&Quit"
 
 #: AART_project/src/main.py:148
 msgid "Quit application"
-msgstr ""
+msgstr "Quit application"
 
 #: AART_project/src/main.py:150
 msgid "&File"
-msgstr ""
+msgstr "&File"
 
 #: AART_project/src/main.py:164
 msgid "Select web camera"
-msgstr ""
+msgstr "Select web camera"
 
 #: AART_project/src/main.py:174
 msgid "Choose a file"
-msgstr ""
+msgstr "Choose a file"
 
 #: AART_project/src/main.py:175
 msgid "Video files(*.mp4;*.avi)|*.mp4;*.avi"
-msgstr ""
+msgstr "Video files(*.mp4;*.avi)|*.mp4;*.avi"
 
 #: AART_project/src/main.py:195
 msgid "Athlete Analysis of Real Time Sports Events( AART )"
-msgstr ""
+msgstr "Athlete Analysis of Real Time Sports Events( AART )"
 
 #: AART_project/src/media/media.py:100 AART_project/src/media/media.py:183
 #: AART_project/src/media/media.py:193 AART_project/src/media/media.py:336
 #: AART_project/src/media/media.py:349
 msgid "Play"
-msgstr ""
+msgstr "Play"
 
 #: AART_project/src/media/media.py:131
-msgid ""
-"Unable to load webcam, it might be busy.\n"
-msgstr ""
+msgid "Unable to load webcam, it might be busy."
+msgstr "Unable to load webcam, it might be busy."
 
 #: AART_project/src/media/media.py:132
 msgid "Try it again"
-msgstr ""
+msgstr "Try it again"
 
 #: AART_project/src/media/media.py:134
 msgid "Loading file failed, please check again"
-msgstr ""
+msgstr "Loading file failed, please check again"
 
 #: AART_project/src/media/media.py:138 AART_project/src/welcome/welcome.py:162
 msgid "ERROR"
-msgstr ""
+msgstr "ERROR"
 
 #: AART_project/src/media/media.py:188 AART_project/src/media/media.py:196
 #: AART_project/src/media/media.py:235 AART_project/src/media/media.py:280
 #: AART_project/src/media/media.py:341 AART_project/src/media/media.py:352
 msgid "Pause"
-msgstr ""
+msgstr "Pause"
 
 #: AART_project/src/media/media.py:281
 msgid "forward"
-msgstr ""
+msgstr "forward"
 
 #: AART_project/src/media/media.py:282
 msgid "backward"
-msgstr ""
+msgstr "backward"
 
 #: AART_project/src/output/output.py:56 AART_project/src/output/output.py:127
 msgid "out"
-msgstr ""
+msgstr "out"
 
 #: AART_project/src/output/output.py:64
 msgid " Athlete action: "
-msgstr ""
+msgstr " Athlete action: "
 
 #: AART_project/src/output/output.py:135
 msgid " Athlete picture"
-msgstr ""
+msgstr " Athlete picture"
 
 #: AART_project/src/welcome/welcome.py:118
 msgid "   No recent files"
-msgstr ""
+msgstr "   No recent files"
 
 #: AART_project/src/welcome/welcome.py:161
 msgid "File not found."
-msgstr ""
+msgstr "File not found."
 
 #: AART_project/src/welcome/welcome.py:174
 msgid "Recent file"
-msgstr ""
+msgstr "Recent file"
 

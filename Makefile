@@ -1,13 +1,14 @@
 GIT_HOOKS := .git/hooks/applied
 SRC := AART_project/src
-LC := AART_project/src/locales/tw/LC_MESSAGES
+LCTW := AART_project/src/locales/tw/LC_MESSAGES
+LCEN := AART_project/src/locales/en/LC_MESSAGES
 hook: ${GIT_HOOKS}
 
 $(GIT_HOOKS):
 	@bash ./scripts/install-git-hooks
 	@echo
 
-genpo: ${SRC}/config/configJSON.py \
+genenpo: ${SRC}/config/configJSON.py \
 		${SRC}/device/device.py \
 		${SRC}/input/input.py \
 		${SRC}/main.py \
@@ -15,16 +16,36 @@ genpo: ${SRC}/config/configJSON.py \
 		${SRC}/output/output.py \
 		${SRC}/welcome/welcome.py
 		@mkdir -p ${SRC}/locales
-		pygettext3.5 -d base -o ${SRC}/locales/base.pot $^
-		@mkdir -p ${LC}
-		@sed -i 's/"Content-Type: text\/plain; charset=CHARSET\\n"/"Content-Type: text\/plain; charset=UTF-8\\n"/g' ${SRC}/locales/base.pot
-		@cp ${SRC}/locales/base.pot ${LC}/base.po
+		pygettext3.5 -d base -o ${SRC}/locales/baseen.pot $^
+		@mkdir -p ${LCEN}
+		@sed -i 's/"Content-Type: text\/plain; charset=CHARSET\\n"/"Content-Type: text\/plain; charset=UTF-8\\n"/g' ${SRC}/locales/baseen.pot
+		@cp ${SRC}/locales/baseen.pot ${LCEN}/base.po
 
-genmo: ${LC}/base.po
-	msgfmt --statistics -D ${LC} -o ${LC}/base.mo base
+genenmo: ${LCEN}/base.po
+	msgfmt --statistics -D ${LCEN} -o ${LCEN}/base.mo base
 
-.PHONY: genclean
+gentwpo: ${SRC}/config/configJSON.py \
+		${SRC}/device/device.py \
+		${SRC}/input/input.py \
+		${SRC}/main.py \
+		${SRC}/media/media.py \
+		${SRC}/output/output.py \
+		${SRC}/welcome/welcome.py
+		@mkdir -p ${SRC}/locales
+		pygettext3.5 -d base -o ${SRC}/locales/basetw.pot $^
+		@mkdir -p ${LCTW}
+		@sed -i 's/"Content-Type: text\/plain; charset=CHARSET\\n"/"Content-Type: text\/plain; charset=UTF-8\\n"/g' ${SRC}/locales/basetw.pot
+		@cp ${SRC}/locales/basetw.pot ${LCTW}/base.po
 
-genclean: 
-	rm -f ${SRC}/locales/base.pot
-	rm -f ${LC}/base.*
+gentwmo: ${LCTW}/base.po
+	msgfmt --statistics -D ${LCTW} -o ${LCTW}/base.mo base
+
+.PHONY: gentwclean, genenclean
+
+gentwclean: 
+	rm -f ${SRC}/locales/basetw.pot
+	rm -f ${LCTW}/base.*
+
+genenclean:
+	rm -f ${SRC}/locales/baseen.pot
+	rm -f ${LCEN}/base.*
