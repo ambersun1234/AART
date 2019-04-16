@@ -101,7 +101,7 @@ class MediaFrame(wx.Panel):
 		if self.choice == self.type["video"] and \
 			self.mediaBar.slider.GetValue() == self.mediaBar.slider.GetMax():
 			self.timer.Stop()
-			self.mediaBar.controlButton.SetLabel(_("Play"))
+			self.mediaBar.controlButton.SetBitmap(self.mediaBar.playImg)
 			# which means the video play to the end and stop
 
 		ret, frame = self.cap.read()
@@ -182,22 +182,24 @@ class MediaFrame(wx.Panel):
 
 		# play pause setup
 		if keycode == wx.WXK_SPACE or chr(keycode) == "k" or chr(keycode) == "K":
+
 			# pause or play check based on self.control
 			if self.choice == self.type["video"] and \
-				self.mediaBar.controlButton.GetLabel() == _("Play") and \
+				not self.timer.IsRunning() and \
 				self.mediaBar.slider.GetValue() == self.mediaBar.slider.GetMax():
+
 				self.mediaBar.slider.SetValue(0)
 				self.timer.Start(1000. / self.fps)
 				self.control = True
-				self.mediaBar.controlButton.SetLabel(_("Pause"))
+				self.mediaBar.controlButton.SetBitmap(self.mediaBar.pauseImg)
 				self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 			else:
 				if self.control:
 					self.timer.Stop()
-					self.mediaBar.controlButton.SetLabel(_("Play"))
+					self.mediaBar.controlButton.SetBitmap(self.mediaBar.playImg)
 				else:
 					self.timer.Start(1000. / self.fps)
-					self.mediaBar.controlButton.SetLabel(_("Pause"))
+					self.mediaBar.controlButton.SetBitmap(self.mediaBar.pauseImg)
 				self.control = not self.control
 
 		if self.choice == self.type["video"]:
@@ -236,7 +238,7 @@ class MediaFrame(wx.Panel):
 
 		self.mediaBar.slider.SetMin(0)
 		self.mediaBar.slider.SetValue(0)
-		self.mediaBar.controlButton.SetLabel(_("Pause"))
+		self.mediaBar.controlButton.SetBitmap(self.mediaBar.pauseImg)
 		# reinitialize mediaFrame self variable
 		# since user may change webcam or video during broadcast
 
@@ -258,13 +260,51 @@ class MediaFrame(wx.Panel):
 			self.iterate()
 
 class MediaBar(wx.Panel):
-	def __init__(self, parent, size, config, mediaFrame):
+	def __init__(self, parent, size, config, mediaFrame, path):
 		wx.Panel.__init__(self, parent, size=size)
 		self.config = config
 		self.mediaFrame = mediaFrame
 		self.mediaLength = 0
 		self.width, self.height = self.GetSize()
 		self.slider = None
+		self.imgPath = path
+
+		# read img buttons
+		self.playImg = wx.Image("{}/img/play.png".format(self.imgPath))
+		self.pauseImg = wx.Image("{}/img/pause.png".format(self.imgPath))
+		self.forwardImg = wx.Image("{}/img/forward.png".format(self.imgPath))
+		self.backwardImg = wx.Image("{}/img/backward.png".format(self.imgPath))
+
+		w, h = self.GetSize()
+		# resize
+		w = h - 10
+		h = h - 20
+		self.playImg = self.playImg.Scale(
+			w,
+			h,
+			quality=wx.IMAGE_QUALITY_HIGH
+		)
+		self.pauseImg = self.pauseImg.Scale(
+			w,
+			h,
+			quality=wx.IMAGE_QUALITY_HIGH
+		)
+		self.forwardImg = self.forwardImg.Scale(
+			w,
+			h,
+			quality=wx.IMAGE_QUALITY_HIGH
+		)
+		self.backwardImg = self.backwardImg.Scale(
+			w,
+			h,
+			quality=wx.IMAGE_QUALITY_HIGH
+		)
+
+		# convert img buttons to bmp
+		self.playImg = self.playImg.ConvertToBitmap()
+		self.pauseImg = self.pauseImg.ConvertToBitmap()
+		self.forwardImg = self.forwardImg.ConvertToBitmap()
+		self.backwardImg = self.backwardImg.ConvertToBitmap()
 
 		self.controlButton = None
 		self.forward = None
@@ -281,9 +321,11 @@ class MediaBar(wx.Panel):
 		self.SetBackgroundColour(
 			"#4c4c4c" if self.config.loadedConfig["theme"] == "dark" else "white"
 		)
-		self.controlButton = wx.Button(self, label=_("Pause"))
-		self.forward = wx.Button(self, label=_("forward"))
-		self.backward = wx.Button(self, label=_("backward"))
+
+		self.controlButton = wx.BitmapButton(self, bitmap=self.pauseImg)
+		self.forward = wx.BitmapButton(self, bitmap=self.forwardImg)
+		self.backward = wx.BitmapButton(self, bitmap=self.backwardImg)
+
 		self.slider = wx.Slider(
 			self,
 			minValue=0,
@@ -294,12 +336,12 @@ class MediaBar(wx.Panel):
 
 		hbox = wx.BoxSizer(wx.HORIZONTAL)
 		hbox.Add(self.slider, flag=wx.ALIGN_LEFT | wx.ALL)
+		hbox.AddSpacer(25)
+		hbox.Add(self.backward, flag=wx.ALIGN_RIGHT | wx.ALL | wx.ALIGN_CENTER)
 		hbox.AddSpacer(5)
-		hbox.Add(self.backward, flag=wx.ALIGN_RIGHT | wx.ALL)
-		hbox.AddSpacer(3)
-		hbox.Add(self.controlButton, flag=wx.ALL | wx.ALIGN_RIGHT)
-		hbox.AddSpacer(3)
-		hbox.Add(self.forward, flag=wx.ALIGN_RIGHT | wx.ALL)
+		hbox.Add(self.controlButton, flag=wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER)
+		hbox.AddSpacer(5)
+		hbox.Add(self.forward, flag=wx.ALIGN_RIGHT | wx.ALL | wx.ALIGN_CENTER)
 		self.SetSizer(hbox)
 
 		# key event binding
@@ -339,12 +381,12 @@ class MediaBar(wx.Panel):
 
 	def onKeyBtn(self, event):
 		if self.mediaFrame.choice == self.mediaFrame.type["video"] and \
-			self.controlButton.GetLabel() == _("Play") and \
+			not self.mediaFrame.timer.IsRunning() and \
 			self.slider.GetValue() == self.slider.GetMax():
 			self.slider.SetValue(0)
 			self.mediaFrame.timer.Start(1000. / self.mediaFrame.fps)
 			# self.mediaFrame.control = True
-			self.controlButton.SetLabel(_("Pause"))
+			self.controlButton.SetBitmap(self.pauseImg)
 			self.mediaFrame.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 			self.mediaFrame.control = not self.mediaFrame.control
 
@@ -352,15 +394,17 @@ class MediaBar(wx.Panel):
 			# pause or play check based on self.control
 			if self.mediaFrame.control:
 				self.mediaFrame.timer.Stop()
-				self.controlButton.SetLabel(_("Play"))
+				# self.controlButton.SetLabel(_("Play"))
+				self.controlButton.SetBitmap(self.playImg)
 			else:
 				self.mediaFrame.timer.Start(1000. / self.mediaFrame.fps)
-				self.controlButton.SetLabel(_("Pause"))
+				# self.controlButton.SetLabel(_("Pause"))
+				self.controlButton.SetBitmap(self.pauseImg)
 			self.mediaFrame.control = not self.mediaFrame.control
 		self.mediaFrame.SetFocus()
 
 class MediaPanel(wx.Panel):
-	def __init__(self, parent, size, config):
+	def __init__(self, parent, size, config, path):
 		# frame display size
 		w, h = size
 		frameSize = (w, h * 0.95)
@@ -377,7 +421,8 @@ class MediaPanel(wx.Panel):
 			self,
 			size=barSize,
 			config=config,
-			mediaFrame=self.mediaFrame
+			mediaFrame=self.mediaFrame,
+			path=path
 		)
 
 		# Caution: use it carefully,

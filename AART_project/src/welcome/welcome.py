@@ -26,8 +26,9 @@ class WelcomeGuide(wx.Dialog):
 		global _
 		_ = t.gettext
 
-		self.logo = wx.Image("{}/logo{}.png".format(os.path.dirname(path), lang))
+		self.logo = wx.Image("{}/img/logo{}.png".format(path, lang))
 		self.initUI()
+
 		self.Show()
 
 	def initUI(self):

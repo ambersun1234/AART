@@ -41,7 +41,8 @@ class Frame(wx.Frame):
 				self.currentScreenX * 0.7,
 				self.currentScreenY * 0.7
 			),
-			config=self.config
+			config=self.config,
+			path=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 		)
 		self.OutputPicPanel = OutputPicPanel(
 			self,
@@ -74,7 +75,8 @@ class Frame(wx.Frame):
 			title=_("Welcome to AART"),
 			size=(self.currentScreenX * 0.5, self.currentScreenY * 0.5),
 			path=os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-			config=self.config
+			config=self.config,
+			parent=self
 		)
 
 		self.initUI()
@@ -107,10 +109,14 @@ class Frame(wx.Frame):
 		self.SetSizer(vbox)
 		self.Show()
 
-		self.welcome.ShowModal()
-		if not self.welcome.path == "":
-			self.mediaPanel.doLoad(self.welcome.path)
-		self.welcome.Destroy()
+		with self.welcome as dlg:
+			dlg.ShowModal()
+			if not self.welcome.path == "":
+				dlg.Destroy()
+				self.mediaPanel.doLoad(self.welcome.path)
+				dlg.Destroy()
+			else:
+				dlg.Destroy()
 
 	def getMinResolution(self):
 		rx = 7680
