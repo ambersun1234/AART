@@ -1,5 +1,6 @@
 input/*
 config.py
+config.json
 venv/
 __pycache__/
 .idea/
