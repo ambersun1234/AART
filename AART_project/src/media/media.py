@@ -2,6 +2,8 @@ import wx
 import wx.media
 import cv2
 
+import math
+
 import gettext
 
 class PreviewCamera(wx.Panel):
@@ -120,6 +122,10 @@ class MediaFrame(wx.Panel):
 			if self.choice == self.type["video"]:
 				self.mediaBar.onTimer()
 
+			# refersh video time
+			self.mediaBar.calculateVideoTime(type="start")
+			self.mediaBar.dynamicVideoTime()
+
 			self.Refresh()
 
 	def iterate(self):
@@ -174,6 +180,15 @@ class MediaFrame(wx.Panel):
 			self.Bind(wx.EVT_PAINT, self.onPaint)
 			self.Bind(wx.EVT_TIMER, self.getNext)
 			self.Bind(wx.EVT_CHAR, self.onKey)
+
+			# set fps to video's fps
+			self.fps = self.cap.get(cv2.CAP_PROP_FPS)
+			self.mediaBar.fps = self.fps
+			self.mediaBar.mediaLength = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+			# set video time by calling mediaBar.calculateVideoTime()
+			self.mediaBar.calculateVideoTime(type="end")
+			self.mediaBar.resetVideoTime()
 
 			self.timer.Start(1000. / self.fps)
 
@@ -265,9 +280,14 @@ class MediaBar(wx.Panel):
 		self.config = config
 		self.mediaFrame = mediaFrame
 		self.mediaLength = 0
+		self.fps = 0
 		self.width, self.height = self.GetSize()
 		self.slider = None
 		self.imgPath = path
+
+		# video time bar
+		self.startTime = {"h": 0, "m": 0, "s": 0}
+		self.endTime = {"h": 0, "m": 0, "s": 0}
 
 		# read img buttons
 		self.playImg = wx.Image("{}/img/play.png".format(self.imgPath))
@@ -310,6 +330,9 @@ class MediaBar(wx.Panel):
 		self.forward = None
 		self.backward = None
 
+		self.stt = None
+		self.ett = None
+
 		self.initUI()
 
 	def onChange(self, event):
@@ -334,9 +357,54 @@ class MediaBar(wx.Panel):
 			size=(self.width * 0.75, self.height)
 		)
 
+		self.stt = wx.StaticText(
+			self,
+			label="{:02d}:{:02d}:{:02d}".format(
+				self.startTime["h"],
+				self.startTime["m"],
+				self.startTime["s"]
+			)
+		)
+		self.ett = wx.StaticText(
+			self,
+			label="/{:02d}:{:02d}:{:02d}".format(
+				self.endTime["h"],
+				self.endTime["m"],
+				self.endTime["s"]
+			)
+		)
+
+		self.stt.SetFont(wx.Font(
+			self.config.loadedConfig["fontSize"] - 3,
+			family=wx.DEFAULT,
+			style=wx.NORMAL,
+			weight=wx.NORMAL)
+		)
+		self.ett.SetFont(wx.Font(
+			self.config.loadedConfig["fontSize"] - 3,
+			family=wx.DEFAULT,
+			style=wx.NORMAL,
+			weight=wx.NORMAL)
+		)
+
+		self.stt.SetForegroundColour(
+			"white" if self.config.loadedConfig["theme"] == "dark" else "black"
+		)
+		self.ett.SetForegroundColour(
+			"white" if self.config.loadedConfig["theme"] == "dark" else "black"
+		)
+
 		hbox = wx.BoxSizer(wx.HORIZONTAL)
+		# slider
 		hbox.Add(self.slider, flag=wx.ALIGN_LEFT | wx.ALL)
-		hbox.AddSpacer(25)
+		hbox.AddSpacer(5)
+
+		# video time
+		hbox.Add(self.stt, flag=wx.ALIGN_CENTER)
+		hbox.Add(self.ett, flag=wx.ALIGN_CENTER)
+		hbox.AddSpacer(5)
+
+		# buttons
 		hbox.Add(self.backward, flag=wx.ALIGN_RIGHT | wx.ALL | wx.ALIGN_CENTER)
 		hbox.AddSpacer(5)
 		hbox.Add(self.controlButton, flag=wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER)
@@ -354,6 +422,56 @@ class MediaBar(wx.Panel):
 			wx.EVT_SLIDER,
 			self.onChange
 		)
+
+	def resetVideoTime(self):
+		self.ett.SetLabel(
+			"/{:02d}:{:02d}:{:02d}".format(
+				self.endTime["h"],
+				self.endTime["m"],
+				self.endTime["s"]
+			)
+		)
+
+	def dynamicVideoTime(self):
+		self.stt.SetLabel(
+			"{:02d}:{:02d}:{:02d}".format(
+				self.startTime["h"],
+				self.startTime["m"],
+				self.startTime["s"]
+			)
+		)
+
+	def calculateVideoTime(self, type="start"):
+		if type == "start":
+			totalSecond = math.floor(self.slider.GetValue() / self.fps)
+		else:
+			totalSecond = math.floor(self.mediaLength / self.fps)
+
+		if totalSecond >= 3600:
+			# over an hour
+			hour = math.floor(totalSecond / 3600)
+			minute = math.floor((totalSecond - hour * 3600) / 60)
+			totalSecond = totalSecond - hour * 3600
+			second = math.floor(totalSecond - minute * 60)
+
+		elif totalSecond < 3600 and totalSecond >= 60:
+			# between hour and second
+			hour = 0
+			minute = math.floor(totalSecond / 60)
+			second = math.floor(totalSecond - minute * 60)
+		else:
+			hour = 0
+			minute = 0
+			second = math.floor(totalSecond)
+
+		if type == "start":
+			self.startTime["h"] = hour
+			self.startTime["m"] = minute
+			self.startTime["s"] = second
+		else:
+			self.endTime["h"] = hour
+			self.endTime["m"] = minute
+			self.endTime["s"] = second
 
 	def onTimer(self):
 		self.slider.SetValue(self.slider.GetValue() + 1)

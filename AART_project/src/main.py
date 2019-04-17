@@ -75,8 +75,7 @@ class Frame(wx.Frame):
 			title=_("Welcome to AART"),
 			size=(self.currentScreenX * 0.5, self.currentScreenY * 0.5),
 			path=os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-			config=self.config,
-			parent=self
+			config=self.config
 		)
 
 		self.initUI()
@@ -131,11 +130,11 @@ class Frame(wx.Frame):
 
 	def initSize(self):
 		screenX, screenY = self.getMinResolution()
-		self.currentScreenX = screenX * 0.75
-		self.currentScreenY = screenY * 0.8
+		# self.currentScreenX = screenX * 0.75
+		# self.currentScreenY = screenY * 0.8
 
-		# self.currentScreenX = screenX
-		# self.currentScreenY = screenY
+		self.currentScreenX = screenX
+		self.currentScreenY = screenY
 
 		self.SetSize(self.currentScreenX, self.currentScreenY)
 		self.Centre()

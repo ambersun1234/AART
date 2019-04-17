@@ -88,6 +88,12 @@ class InputPanel(wx.Panel):
 
 			# button ok
 			ok = wx.Button(self, label=_("Ok"), size=(60, 30))
+			ok.SetFont(wx.Font(
+				11,
+				family=wx.DEFAULT,
+				style=wx.NORMAL,
+				weight=wx.FONTWEIGHT_BOLD
+			))
 			ok.SetForegroundColour("green")
 			box.Add(ok, flag=wx.ALL, border=5)
 			ok.Bind(
@@ -98,6 +104,12 @@ class InputPanel(wx.Panel):
 
 			# button close
 			close = wx.Button(self, label=_("Clear"), size=(60, 30))
+			close.SetFont(wx.Font(
+				11,
+				family=wx.DEFAULT,
+				style=wx.NORMAL,
+				weight=wx.FONTWEIGHT_BOLD
+			))
 			close.SetForegroundColour("red")
 			box.Add(close, flag=wx.ALL, border=5)
 			close.Bind(
