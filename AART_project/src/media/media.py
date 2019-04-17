@@ -184,7 +184,9 @@ class MediaFrame(wx.Panel):
 			# set fps to video's fps
 			self.fps = self.cap.get(cv2.CAP_PROP_FPS)
 			self.mediaBar.fps = self.fps
-			self.mediaBar.mediaLength = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
+			self.mediaBar.mediaLength = \
+				int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT)) \
+				if self.type["video"] == self.choice else 0
 
 			# set video time by calling mediaBar.calculateVideoTime()
 			self.mediaBar.calculateVideoTime(type="end")
@@ -469,6 +471,8 @@ class MediaBar(wx.Panel):
 			self.startTime["m"] = minute
 			self.startTime["s"] = second
 		else:
+			if second < 0:
+				second = 0
 			self.endTime["h"] = hour
 			self.endTime["m"] = minute
 			self.endTime["s"] = second
