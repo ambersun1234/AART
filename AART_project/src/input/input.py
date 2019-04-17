@@ -38,18 +38,20 @@ class InputPanel(wx.Panel):
 
 		title = wx.StaticText(self, label=_(" Athlete trace: "))
 		title.SetForegroundColour(
-			"white" if self.config.loadedConfig["theme"] == "dark" else "black"
+			self.config.loadedConfig["colorText"]
+		)
+		title.SetBackgroundColour(
+			self.config.loadedConfig["colorTitle"]
+			if self.config.loadedConfig["theme"] == "dark" else "white"
 		)
 		title.SetFont(wx.Font(
-			self.config.loadedConfig["fontSize"],
+			self.config.loadedConfig["fontSize"] + 5,
 			family=wx.DEFAULT,
 			style=wx.NORMAL,
 			weight=wx.NORMAL)
 		)
 		titleLine = wx.StaticLine(self, style=wx.LI_HORIZONTAL)
-		vbox.AddSpacer(5)
-		vbox.Add(title)
-		vbox.AddSpacer(5)
+		vbox.Add(title, flag=wx.ALL | wx.EXPAND)
 		vbox.Add(titleLine, flag=wx.EXPAND | wx.ALL)
 		vbox.AddSpacer(5)
 
@@ -64,7 +66,7 @@ class InputPanel(wx.Panel):
 
 		for element in sta:
 			element.SetForegroundColour(
-				"white" if self.config.loadedConfig["theme"] == "dark" else "black"
+				self.config.loadedConfig["colorText"]
 			)
 			element.SetFont(wx.Font(
 				self.config.loadedConfig["fontSize"],
@@ -123,7 +125,8 @@ class InputPanel(wx.Panel):
 
 		self.SetSizer(vbox)
 		self.SetBackgroundColour(
-			"#4c4c4c" if self.config.loadedConfig["theme"] == "dark" else "white"
+			self.config.loadedConfig["colorBg"]
+			if self.config.loadedConfig["theme"] == "dark" else "white"
 		)
 		self.Show()
 

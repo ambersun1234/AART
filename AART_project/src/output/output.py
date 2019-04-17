@@ -53,7 +53,8 @@ class OutputTextPanel(wx.Panel):
 
 	def initUI(self):
 		self.SetBackgroundColour(
-			"#4c4c4c" if self.config.loadedConfig["theme"] == "dark" else "white"
+			self.config.loadedConfig["colorBg"]
+			if self.config.loadedConfig["theme"] == "dark" else "white"
 		)
 
 		self.sp = scrolled.ScrolledPanel(
@@ -68,17 +69,19 @@ class OutputTextPanel(wx.Panel):
 
 		title = wx.StaticText(self, label=_(" Athlete action: "))
 		title.SetForegroundColour(
-			"white" if self.config.loadedConfig["theme"] == "dark" else "black"
+			self.config.loadedConfig["colorText"]
+		)
+		title.SetBackgroundColour(
+			self.config.loadedConfig["colorTitle"]
+			if self.config.loadedConfig["theme"] == "dark" else "white"
 		)
 		title.SetFont(wx.Font(
-			self.config.loadedConfig["fontSize"],
+			self.config.loadedConfig["fontSize"] + 5,
 			family=wx.DEFAULT,
 			style=wx.NORMAL,
 			weight=wx.NORMAL)
 		)
-		vbox.AddSpacer(5)
-		vbox.Add(title)
-		vbox.AddSpacer(5)
+		vbox.Add(title, flag=wx.ALL | wx.EXPAND)
 		vbox.Add(
 			wx.StaticLine(
 				self,
@@ -96,7 +99,7 @@ class OutputTextPanel(wx.Panel):
 				size=(-1, self.config.loadedConfig["fontSize"] + 17)
 			)
 			temp.SetForegroundColour(
-				"white" if self.config.loadedConfig["theme"] == "dark" else "black"
+				self.config.loadedConfig["colorText"]
 			)
 			temp.SetFont(wx.Font(
 				self.config.loadedConfig["fontSize"],
@@ -139,7 +142,8 @@ class OutputPicPanel(wx.Panel):
 
 	def initUI(self):
 		self.SetBackgroundColour(
-			"#4c4c4c" if self.config.loadedConfig["theme"] == "dark" else "white"
+			self.config.loadedConfig["colorBg"]
+			if self.config.loadedConfig["theme"] == "dark" else "white"
 		)
 
 		self.sp = scrolled.ScrolledPanel(
@@ -154,19 +158,21 @@ class OutputPicPanel(wx.Panel):
 
 		title = wx.StaticText(self, label=_(" Athlete picture"))
 		title.SetForegroundColour(
-			"white" if self.config.loadedConfig["theme"] == "dark" else "black"
+			self.config.loadedConfig["colorText"]
+		)
+		title.SetBackgroundColour(
+			self.config.loadedConfig["colorTitle"]
+			if self.config.loadedConfig["theme"] == "dark" else "white"
 		)
 		title.SetFont(wx.Font(
-			self.config.loadedConfig["fontSize"],
+			self.config.loadedConfig["fontSize"] + 5,
 			family=wx.DEFAULT,
 			style=wx.NORMAL,
 			weight=wx.NORMAL)
 		)
 		titleLine = wx.StaticLine(self, style=wx.LI_HORIZONTAL)
 
-		vbox.AddSpacer(5)
-		vbox.Add(title)
-		vbox.AddSpacer(5)
+		vbox.Add(title, flag=wx.ALL | wx.EXPAND)
 		vbox.Add(titleLine, flag=wx.EXPAND | wx.ALL)
 		vbox.AddSpacer(5)
 		vbox.Add(spbox)

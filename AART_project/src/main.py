@@ -89,13 +89,11 @@ class Frame(wx.Frame):
 
 		hboxUp.Add(self.mediaPanel)
 		line = wx.StaticLine(self, size=(5, 5), style=wx.LI_VERTICAL)
-		line.SetForegroundColour("#f75b25")
 		hboxUp.Add(line)
 		hboxUp.Add(self.OutputTextPanel)
 
 		hboxBottom.Add(self.OutputPicPanel)
 		line = wx.StaticLine(self, size=(5, 5), style=wx.LI_VERTICAL)
-		line.SetBackgroundColour("#f75b25")
 		hboxBottom.Add(line)
 		hboxBottom.Add(self.inputPanel)
 

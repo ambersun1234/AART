@@ -88,7 +88,8 @@ class MediaFrame(wx.Panel):
 
 	def initUI(self):
 		self.SetBackgroundColour(
-			"#4c4c4c" if self.config.loadedConfig["theme"] == "dark" else "white"
+			self.config.loadedConfig["colorBg"]
+			if self.config.loadedConfig["theme"] == "dark" else "white"
 		)
 
 	def onPaint(self, event):
@@ -344,7 +345,8 @@ class MediaBar(wx.Panel):
 
 	def initUI(self):
 		self.SetBackgroundColour(
-			"#4c4c4c" if self.config.loadedConfig["theme"] == "dark" else "white"
+			self.config.loadedConfig["colorBg"]
+			if self.config.loadedConfig["theme"] == "dark" else "white"
 		)
 
 		self.controlButton = wx.BitmapButton(self, bitmap=self.pauseImg)
@@ -390,10 +392,10 @@ class MediaBar(wx.Panel):
 		)
 
 		self.stt.SetForegroundColour(
-			"white" if self.config.loadedConfig["theme"] == "dark" else "black"
+			self.config.loadedConfig["colorText"]
 		)
 		self.ett.SetForegroundColour(
-			"white" if self.config.loadedConfig["theme"] == "dark" else "black"
+			self.config.loadedConfig["colorText"]
 		)
 
 		hbox = wx.BoxSizer(wx.HORIZONTAL)
