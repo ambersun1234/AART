@@ -3,7 +3,7 @@ import math
 import random
 import numpy as np
 
-from config import *
+from src.config.yoloConfig import *
 # 導入各自機器的檔案路徑
 
 myHomeDir = darknetDir

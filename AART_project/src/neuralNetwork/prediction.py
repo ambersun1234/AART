@@ -21,17 +21,15 @@ except ImportError as e:
 class runNeuralNetwork:
     def __init__(self):
         params = dict()
-        params["model_folder"] = "/home/louisme/library/openpose/models"
+        params["model_folder"] = defaultModelFolder
         opWrapper = openpose.WrapperPython()
         opWrapper.configure(params)
         opWrapper.start()
         datum = openpose.Datum()
         self.opWrapper = opWrapper
         self.datum = datum
-        self.net = load_net(b"/home/louisme/library/darknet/jerseyNumber/cfg/yolov3.cfg",
-                           b"/home/louisme/library/darknet/jerseyNumber/cfg/weights/yolov3_20000.weights",
-                           0)
-        self.meta = load_meta(b"/home/louisme/library/darknet/jerseyNumber/cfg/obj.data")
+        self.net = load_net(darknetCfg.encode('utf-8'), darnetWeights.encode('utf-8'), 0)
+        self.meta = load_meta(darknetData.encode('utf-8'))
         self.keypointHistory = dict()
         self.shootingCount = 1
         self.layupCount = 1
