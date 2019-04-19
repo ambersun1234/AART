@@ -41,7 +41,8 @@ class Frame(wx.Frame):
 				self.currentScreenX * 0.7,
 				self.currentScreenY * 0.7
 			),
-			config=self.config
+			config=self.config,
+			path=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 		)
 		self.OutputPicPanel = OutputPicPanel(
 			self,
@@ -88,13 +89,11 @@ class Frame(wx.Frame):
 
 		hboxUp.Add(self.mediaPanel)
 		line = wx.StaticLine(self, size=(5, 5), style=wx.LI_VERTICAL)
-		line.SetForegroundColour("#f75b25")
 		hboxUp.Add(line)
 		hboxUp.Add(self.OutputTextPanel)
 
 		hboxBottom.Add(self.OutputPicPanel)
 		line = wx.StaticLine(self, size=(5, 5), style=wx.LI_VERTICAL)
-		line.SetBackgroundColour("#f75b25")
 		hboxBottom.Add(line)
 		hboxBottom.Add(self.inputPanel)
 
@@ -107,10 +106,14 @@ class Frame(wx.Frame):
 		self.SetSizer(vbox)
 		self.Show()
 
-		self.welcome.ShowModal()
-		if not self.welcome.path == "":
-			self.mediaPanel.doLoad(self.welcome.path)
-		self.welcome.Destroy()
+		with self.welcome as dlg:
+			dlg.ShowModal()
+			if not self.welcome.path == "":
+				dlg.Destroy()
+				self.mediaPanel.doLoad(self.welcome.path)
+				dlg.Destroy()
+			else:
+				dlg.Destroy()
 
 	def getMinResolution(self):
 		rx = 7680
@@ -125,11 +128,11 @@ class Frame(wx.Frame):
 
 	def initSize(self):
 		screenX, screenY = self.getMinResolution()
-		self.currentScreenX = screenX * 0.75
-		self.currentScreenY = screenY * 0.8
+		# self.currentScreenX = screenX * 0.75
+		# self.currentScreenY = screenY * 0.8
 
-		# self.currentScreenX = screenX
-		# self.currentScreenY = screenY
+		self.currentScreenX = screenX
+		self.currentScreenY = screenY
 
 		self.SetSize(self.currentScreenX, self.currentScreenY)
 		self.Centre()

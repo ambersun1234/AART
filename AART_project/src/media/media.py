@@ -2,6 +2,8 @@ import wx
 import wx.media
 import cv2
 
+import math
+
 import gettext
 
 class PreviewCamera(wx.Panel):
@@ -86,7 +88,8 @@ class MediaFrame(wx.Panel):
 
 	def initUI(self):
 		self.SetBackgroundColour(
-			"#4c4c4c" if self.config.loadedConfig["theme"] == "dark" else "white"
+			self.config.loadedConfig["colorBg"]
+			if self.config.loadedConfig["theme"] == "dark" else "white"
 		)
 
 	def onPaint(self, event):
@@ -101,7 +104,7 @@ class MediaFrame(wx.Panel):
 		if self.choice == self.type["video"] and \
 			self.mediaBar.slider.GetValue() == self.mediaBar.slider.GetMax():
 			self.timer.Stop()
-			self.mediaBar.controlButton.SetLabel(_("Play"))
+			self.mediaBar.controlButton.SetBitmap(self.mediaBar.playImg)
 			# which means the video play to the end and stop
 
 		ret, frame = self.cap.read()
@@ -119,6 +122,10 @@ class MediaFrame(wx.Panel):
 			# refresh mediaBar slider
 			if self.choice == self.type["video"]:
 				self.mediaBar.onTimer()
+
+			# refersh video time
+			self.mediaBar.calculateVideoTime(type="start")
+			self.mediaBar.dynamicVideoTime()
 
 			self.Refresh()
 
@@ -175,6 +182,17 @@ class MediaFrame(wx.Panel):
 			self.Bind(wx.EVT_TIMER, self.getNext)
 			self.Bind(wx.EVT_CHAR, self.onKey)
 
+			# set fps to video's fps
+			self.fps = self.cap.get(cv2.CAP_PROP_FPS)
+			self.mediaBar.fps = self.fps
+			self.mediaBar.mediaLength = \
+				int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT)) \
+				if self.type["video"] == self.choice else 0
+
+			# set video time by calling mediaBar.calculateVideoTime()
+			self.mediaBar.calculateVideoTime(type="end")
+			self.mediaBar.resetVideoTime()
+
 			self.timer.Start(1000. / self.fps)
 
 	def onKey(self, event):
@@ -182,22 +200,24 @@ class MediaFrame(wx.Panel):
 
 		# play pause setup
 		if keycode == wx.WXK_SPACE or chr(keycode) == "k" or chr(keycode) == "K":
+
 			# pause or play check based on self.control
 			if self.choice == self.type["video"] and \
-				self.mediaBar.controlButton.GetLabel() == _("Play") and \
+				not self.timer.IsRunning() and \
 				self.mediaBar.slider.GetValue() == self.mediaBar.slider.GetMax():
+
 				self.mediaBar.slider.SetValue(0)
 				self.timer.Start(1000. / self.fps)
 				self.control = True
-				self.mediaBar.controlButton.SetLabel(_("Pause"))
+				self.mediaBar.controlButton.SetBitmap(self.mediaBar.pauseImg)
 				self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 			else:
 				if self.control:
 					self.timer.Stop()
-					self.mediaBar.controlButton.SetLabel(_("Play"))
+					self.mediaBar.controlButton.SetBitmap(self.mediaBar.playImg)
 				else:
 					self.timer.Start(1000. / self.fps)
-					self.mediaBar.controlButton.SetLabel(_("Pause"))
+					self.mediaBar.controlButton.SetBitmap(self.mediaBar.pauseImg)
 				self.control = not self.control
 
 		if self.choice == self.type["video"]:
@@ -236,7 +256,7 @@ class MediaFrame(wx.Panel):
 
 		self.mediaBar.slider.SetMin(0)
 		self.mediaBar.slider.SetValue(0)
-		self.mediaBar.controlButton.SetLabel(_("Pause"))
+		self.mediaBar.controlButton.SetBitmap(self.mediaBar.pauseImg)
 		# reinitialize mediaFrame self variable
 		# since user may change webcam or video during broadcast
 
@@ -258,17 +278,63 @@ class MediaFrame(wx.Panel):
 			self.iterate()
 
 class MediaBar(wx.Panel):
-	def __init__(self, parent, size, config, mediaFrame):
+	def __init__(self, parent, size, config, mediaFrame, path):
 		wx.Panel.__init__(self, parent, size=size)
 		self.config = config
 		self.mediaFrame = mediaFrame
 		self.mediaLength = 0
+		self.fps = 0
 		self.width, self.height = self.GetSize()
 		self.slider = None
+		self.imgPath = path
+
+		# video time bar
+		self.startTime = {"h": 0, "m": 0, "s": 0}
+		self.endTime = {"h": 0, "m": 0, "s": 0}
+
+		# read img buttons
+		self.playImg = wx.Image("{}/img/play.png".format(self.imgPath))
+		self.pauseImg = wx.Image("{}/img/pause.png".format(self.imgPath))
+		self.forwardImg = wx.Image("{}/img/forward.png".format(self.imgPath))
+		self.backwardImg = wx.Image("{}/img/backward.png".format(self.imgPath))
+
+		w, h = self.GetSize()
+		# resize
+		w = h - 10
+		h = h - 20
+		self.playImg = self.playImg.Scale(
+			w,
+			h,
+			quality=wx.IMAGE_QUALITY_HIGH
+		)
+		self.pauseImg = self.pauseImg.Scale(
+			w,
+			h,
+			quality=wx.IMAGE_QUALITY_HIGH
+		)
+		self.forwardImg = self.forwardImg.Scale(
+			w,
+			h,
+			quality=wx.IMAGE_QUALITY_HIGH
+		)
+		self.backwardImg = self.backwardImg.Scale(
+			w,
+			h,
+			quality=wx.IMAGE_QUALITY_HIGH
+		)
+
+		# convert img buttons to bmp
+		self.playImg = self.playImg.ConvertToBitmap()
+		self.pauseImg = self.pauseImg.ConvertToBitmap()
+		self.forwardImg = self.forwardImg.ConvertToBitmap()
+		self.backwardImg = self.backwardImg.ConvertToBitmap()
 
 		self.controlButton = None
 		self.forward = None
 		self.backward = None
+
+		self.stt = None
+		self.ett = None
 
 		self.initUI()
 
@@ -279,11 +345,14 @@ class MediaBar(wx.Panel):
 
 	def initUI(self):
 		self.SetBackgroundColour(
-			"#4c4c4c" if self.config.loadedConfig["theme"] == "dark" else "white"
+			self.config.loadedConfig["colorBg"]
+			if self.config.loadedConfig["theme"] == "dark" else "white"
 		)
-		self.controlButton = wx.Button(self, label=_("Pause"))
-		self.forward = wx.Button(self, label=_("forward"))
-		self.backward = wx.Button(self, label=_("backward"))
+
+		self.controlButton = wx.BitmapButton(self, bitmap=self.pauseImg)
+		self.forward = wx.BitmapButton(self, bitmap=self.forwardImg)
+		self.backward = wx.BitmapButton(self, bitmap=self.backwardImg)
+
 		self.slider = wx.Slider(
 			self,
 			minValue=0,
@@ -292,14 +361,59 @@ class MediaBar(wx.Panel):
 			size=(self.width * 0.75, self.height)
 		)
 
+		self.stt = wx.StaticText(
+			self,
+			label="{:02d}:{:02d}:{:02d}".format(
+				self.startTime["h"],
+				self.startTime["m"],
+				self.startTime["s"]
+			)
+		)
+		self.ett = wx.StaticText(
+			self,
+			label="/{:02d}:{:02d}:{:02d}".format(
+				self.endTime["h"],
+				self.endTime["m"],
+				self.endTime["s"]
+			)
+		)
+
+		self.stt.SetFont(wx.Font(
+			self.config.loadedConfig["fontSize"] - 3,
+			family=wx.DEFAULT,
+			style=wx.NORMAL,
+			weight=wx.NORMAL)
+		)
+		self.ett.SetFont(wx.Font(
+			self.config.loadedConfig["fontSize"] - 3,
+			family=wx.DEFAULT,
+			style=wx.NORMAL,
+			weight=wx.NORMAL)
+		)
+
+		self.stt.SetForegroundColour(
+			self.config.loadedConfig["colorText"]
+		)
+		self.ett.SetForegroundColour(
+			self.config.loadedConfig["colorText"]
+		)
+
 		hbox = wx.BoxSizer(wx.HORIZONTAL)
+		# slider
 		hbox.Add(self.slider, flag=wx.ALIGN_LEFT | wx.ALL)
 		hbox.AddSpacer(5)
-		hbox.Add(self.backward, flag=wx.ALIGN_RIGHT | wx.ALL)
-		hbox.AddSpacer(3)
-		hbox.Add(self.controlButton, flag=wx.ALL | wx.ALIGN_RIGHT)
-		hbox.AddSpacer(3)
-		hbox.Add(self.forward, flag=wx.ALIGN_RIGHT | wx.ALL)
+
+		# video time
+		hbox.Add(self.stt, flag=wx.ALIGN_CENTER)
+		hbox.Add(self.ett, flag=wx.ALIGN_CENTER)
+		hbox.AddSpacer(5)
+
+		# buttons
+		hbox.Add(self.backward, flag=wx.ALIGN_RIGHT | wx.ALL | wx.ALIGN_CENTER)
+		hbox.AddSpacer(5)
+		hbox.Add(self.controlButton, flag=wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER)
+		hbox.AddSpacer(5)
+		hbox.Add(self.forward, flag=wx.ALIGN_RIGHT | wx.ALL | wx.ALIGN_CENTER)
 		self.SetSizer(hbox)
 
 		# key event binding
@@ -312,6 +426,58 @@ class MediaBar(wx.Panel):
 			wx.EVT_SLIDER,
 			self.onChange
 		)
+
+	def resetVideoTime(self):
+		self.ett.SetLabel(
+			"/{:02d}:{:02d}:{:02d}".format(
+				self.endTime["h"],
+				self.endTime["m"],
+				self.endTime["s"]
+			)
+		)
+
+	def dynamicVideoTime(self):
+		self.stt.SetLabel(
+			"{:02d}:{:02d}:{:02d}".format(
+				self.startTime["h"],
+				self.startTime["m"],
+				self.startTime["s"]
+			)
+		)
+
+	def calculateVideoTime(self, type="start"):
+		if type == "start":
+			totalSecond = math.floor(self.slider.GetValue() / self.fps)
+		else:
+			totalSecond = math.floor(self.mediaLength / self.fps)
+
+		if totalSecond >= 3600:
+			# over an hour
+			hour = math.floor(totalSecond / 3600)
+			minute = math.floor((totalSecond - hour * 3600) / 60)
+			totalSecond = totalSecond - hour * 3600
+			second = math.floor(totalSecond - minute * 60)
+
+		elif totalSecond < 3600 and totalSecond >= 60:
+			# between hour and second
+			hour = 0
+			minute = math.floor(totalSecond / 60)
+			second = math.floor(totalSecond - minute * 60)
+		else:
+			hour = 0
+			minute = 0
+			second = math.floor(totalSecond)
+
+		if type == "start":
+			self.startTime["h"] = hour
+			self.startTime["m"] = minute
+			self.startTime["s"] = second
+		else:
+			if second < 0:
+				second = 0
+			self.endTime["h"] = hour
+			self.endTime["m"] = minute
+			self.endTime["s"] = second
 
 	def onTimer(self):
 		self.slider.SetValue(self.slider.GetValue() + 1)
@@ -339,12 +505,12 @@ class MediaBar(wx.Panel):
 
 	def onKeyBtn(self, event):
 		if self.mediaFrame.choice == self.mediaFrame.type["video"] and \
-			self.controlButton.GetLabel() == _("Play") and \
+			not self.mediaFrame.timer.IsRunning() and \
 			self.slider.GetValue() == self.slider.GetMax():
 			self.slider.SetValue(0)
 			self.mediaFrame.timer.Start(1000. / self.mediaFrame.fps)
 			# self.mediaFrame.control = True
-			self.controlButton.SetLabel(_("Pause"))
+			self.controlButton.SetBitmap(self.pauseImg)
 			self.mediaFrame.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 			self.mediaFrame.control = not self.mediaFrame.control
 
@@ -352,15 +518,17 @@ class MediaBar(wx.Panel):
 			# pause or play check based on self.control
 			if self.mediaFrame.control:
 				self.mediaFrame.timer.Stop()
-				self.controlButton.SetLabel(_("Play"))
+				# self.controlButton.SetLabel(_("Play"))
+				self.controlButton.SetBitmap(self.playImg)
 			else:
 				self.mediaFrame.timer.Start(1000. / self.mediaFrame.fps)
-				self.controlButton.SetLabel(_("Pause"))
+				# self.controlButton.SetLabel(_("Pause"))
+				self.controlButton.SetBitmap(self.pauseImg)
 			self.mediaFrame.control = not self.mediaFrame.control
 		self.mediaFrame.SetFocus()
 
 class MediaPanel(wx.Panel):
-	def __init__(self, parent, size, config):
+	def __init__(self, parent, size, config, path):
 		# frame display size
 		w, h = size
 		frameSize = (w, h * 0.95)
@@ -377,7 +545,8 @@ class MediaPanel(wx.Panel):
 			self,
 			size=barSize,
 			config=config,
-			mediaFrame=self.mediaFrame
+			mediaFrame=self.mediaFrame,
+			path=path
 		)
 
 		# Caution: use it carefully,

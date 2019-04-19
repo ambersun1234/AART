@@ -26,8 +26,9 @@ class WelcomeGuide(wx.Dialog):
 		global _
 		_ = t.gettext
 
-		self.logo = wx.Image("{}/logo{}.png".format(os.path.dirname(path), lang))
+		self.logo = wx.Image("{}/img/logo{}.png".format(path, lang))
 		self.initUI()
+
 		self.Show()
 
 	def initUI(self):
@@ -40,7 +41,9 @@ class WelcomeGuide(wx.Dialog):
 		vbox = wx.BoxSizer(wx.VERTICAL)
 
 		if self.config.loadedConfig["theme"] == "dark":
-			self.SetBackgroundColour("#4c4c4c")
+			self.SetBackgroundColour(
+				self.config.loadedConfig["colorBg"]
+			)
 		else:
 			self.SetBackgroundColour("white")
 
@@ -96,8 +99,12 @@ class WelcomeGuide(wx.Dialog):
 				tvbox.Add(temp2, flag=wx.EXPAND)
 
 				if self.config.loadedConfig["theme"] == "dark":
-					temp.SetForegroundColour("white")
-					temp2.SetForegroundColour("#dbdbdb")
+					temp.SetForegroundColour(
+						self.config.loadedConfig["colorText"]
+					)
+					temp2.SetForegroundColour(
+						"#999999"
+					)
 				else:
 					temp.SetForegroundColour("black")
 					temp2.SetForegroundColour("black")
@@ -149,13 +156,21 @@ class WelcomeGuide(wx.Dialog):
 		self.SetSizer(vbox)
 
 	def onEnter(self, event, text, text2):
-		text.SetBackgroundColour("#f75b25")
-		text2.SetBackgroundColour("#f75b25")
+		text.SetBackgroundColour(
+			self.config.loadedConfig["colorTitle"]
+		)
+		text2.SetBackgroundColour(
+			self.config.loadedConfig["colorTitle"]
+		)
 
 	def onLeave(self, event, text, text2):
 		if self.config.loadedConfig["theme"] == "dark":
-			text.SetBackgroundColour("#4c4c4c")
-			text2.SetBackgroundColour("#4c4c4c")
+			text.SetBackgroundColour(
+				self.config.loadedConfig["colorBg"]
+			)
+			text2.SetBackgroundColour(
+				self.config.loadedConfig["colorBg"]
+			)
 		else:
 			text.SetBackgroundColour("white")
 			text2.SetBackgroundColour("white")

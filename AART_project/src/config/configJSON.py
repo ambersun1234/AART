@@ -12,7 +12,10 @@ class Config:
 			"language": "en",
 			"fontSize": 17,
 			"theme": "dark",
-			"recent": temp
+			"recent": temp,
+			"colorBg": "#4F5D75",
+			"colorTitle": "#333138",
+			"colorText": "#F5F0EB"
 		}
 
 		# set language
