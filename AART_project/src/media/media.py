@@ -51,7 +51,7 @@ class PreviewCamera(wx.Panel):
 			self.Refresh()
 
 class MediaFrame(wx.Panel):
-	def __init__(self, parent, size, config):
+	def __init__(self, parent, size, config, nn):
 		wx.Panel.__init__(self, parent, size=size)
 		self.config = config
 		self.mediaBar = None
@@ -63,6 +63,7 @@ class MediaFrame(wx.Panel):
 		self.cap = None
 		self.videoPath = ""
 		self.type = {"webcam": 0, "video": 1}
+		self.nn = nn
 
 		# set language
 		lang = "tw" if self.config.loadedConfig["language"] == "tw" else "en"
@@ -119,6 +120,20 @@ class MediaFrame(wx.Panel):
 			frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 			self.bmp.CopyFromBuffer(frame)
 
+			# pass image to neural network
+			self.nn._iimg = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+			if self.nn._imode is None:
+				self.nn._imode = 0
+				self.nn._idict = dict()
+
+			self.nn.trackNum(
+				self.nn._imode,
+				self.nn._idict,
+				self.nn._iimg
+			)
+			self.timer.Stop()
+			self.timer.Start(1000. / self.fps)
+
 			# refresh mediaBar slider
 			if self.choice == self.type["video"]:
 				self.mediaBar.onTimer()
@@ -126,7 +141,6 @@ class MediaFrame(wx.Panel):
 			# refersh video time
 			self.mediaBar.calculateVideoTime(type="start")
 			self.mediaBar.dynamicVideoTime()
-
 			self.Refresh()
 
 	def iterate(self):
@@ -528,18 +542,20 @@ class MediaBar(wx.Panel):
 		self.mediaFrame.SetFocus()
 
 class MediaPanel(wx.Panel):
-	def __init__(self, parent, size, config, path):
+	def __init__(self, parent, size, config, path, nn):
 		# frame display size
 		w, h = size
 		frameSize = (w, h * 0.95)
 		barSize = (w, h * 0.05)
 		wx.Panel.__init__(self, parent, size=size)
 		self.type = {"webcam": 0, "video": 1}
+		self.nn = nn
 
 		self.mediaFrame = MediaFrame(
 			self,
 			size=frameSize,
-			config=config
+			config=config,
+			nn=self.nn
 		)
 		self.mediaBar = MediaBar(
 			self,

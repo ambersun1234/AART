@@ -13,7 +13,8 @@ try:
     sys.path.append('/usr/local/python')
     from openpose import pyopenpose as openpose
 except ImportError as e:
-    print('Error: OpenPose library could not be found. Did you enable `BUILD_PYTHON` '
+    print('Error: OpenPose library could not be found. '
+          'Did you enable `BUILD_PYTHON` '
           'in CMake and have this Python script in the right folder?')
     raise e
 
@@ -28,7 +29,11 @@ class runNeuralNetwork:
         datum = openpose.Datum()
         self.opWrapper = opWrapper
         self.datum = datum
-        self.net = load_net(darknetCfg.encode('utf-8'), darnetWeights.encode('utf-8'), 0)
+        self.net = load_net(
+            darknetCfg.encode('utf-8'),
+            darnetWeights.encode('utf-8'),
+            0
+        )
         self.meta = load_meta(darknetData.encode('utf-8'))
         self.keypointHistory = dict()
         self.shootingCount = 1
@@ -36,9 +41,26 @@ class runNeuralNetwork:
         self.dribbleCount = 1
         self.saveVideo = dict()
 
+        # input temp, modify by panels
+        self._idict = None
+        # input track dict, e.g. {"person": "11"}
+        self._iimg = None
+        # input image: origin showed image
+        self._imode = None
+        # input mode: 0 or 1 indicate whether there is tracker
+
+        # output temp, retrieve by panels
+        self._odict = None
+        self._oimg = None
+
         with tf.Graph().as_default():
             graph0 = tf.GraphDef()
-            pb_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'frozen_har.pb')
+            pb_path = os.path.join(
+                os.path.dirname(
+                    os.path.abspath(__file__)
+                ),
+                'frozen_har.pb'
+            )
             with open(pb_path, mode='rb') as f:
                 graph0.ParseFromString(f.read())
                 tf.import_graph_def(graph0, name='')
@@ -54,8 +76,13 @@ class runNeuralNetwork:
     def trackNum(self, specific, specific_num, frame):
         result = detect(self.net, self.meta, frame)
         self.datum.cvInputData = frame
-        self.opWrapper.emplaceAndPop([self.datum])
         keypoints = self.datum.poseKeypoints
+        self.opWrapper.emplaceAndPop([self.datum])
+        try:
+            lala = len(keypoints)
+        except:
+            return
+
         self.outputFrame = self.datum.cvOutputData
         retFrame = dict()
         retLSTM = dict()
@@ -73,9 +100,16 @@ class runNeuralNetwork:
             personNum = 'person{}'.format(num)
 
             x, y, w, h = i[2][0], i[2][1], i[2][2], i[2][3]
-            xmin, ymin, xmax, ymax = self.convertBack(float(x), float(y), float(w), float(h))
+            xmin, ymin, xmax, ymax = self.convertBack(
+                float(x),
+                float(y),
+                float(w),
+                float(h)
+            )
             for j in range(len(keypoints)):
-                if keypoints[j][1][2] != 0 and x - 50 <= keypoints[j][1][0] <= x + 50 and ymin - 50 <= keypoints[j][1][1] <= ymin + 50:
+                if keypoints[j][1][2] != 0 and \
+                        x - 50 <= keypoints[j][1][0] <= x + 50 \
+                        and ymin - 50 <= keypoints[j][1][1] <= ymin + 50:
                     normalizedPoint, poseture = self.normalize(keypoints[j])
                     retFrame[str(num)] = poseture
                     # Save the keypoints to the txt for LSTM detect
@@ -83,24 +117,46 @@ class runNeuralNetwork:
                         self.keypointHistory[personNum] = [[]]
                         self.saveVideo[personNum] = [frame]
                         for pointNum in range(len(normalizedPoint)):
-                            if 8 >= pointNum >= 1 or 11 >= pointNum >= 10 or 14 >= pointNum >= 13:
-                                self.keypointHistory[personNum][0].append(normalizedPoint[pointNum][0])
-                                self.keypointHistory[personNum][0].append(normalizedPoint[pointNum][1])
+                            if 8 >= pointNum >= 1 or \
+                                    11 >= pointNum >= 10 or \
+                                    14 >= pointNum >= 13:
+                                self.keypointHistory[personNum][0].append(
+                                    normalizedPoint[pointNum][0]
+                                )
+                                self.keypointHistory[personNum][0].append(
+                                    normalizedPoint[pointNum][1]
+                                )
                     else:
                         lines = len(self.keypointHistory[personNum])
                         if lines < 61:
                             self.keypointHistory[personNum].append([])
                             self.saveVideo[personNum].append(frame)
                             for pointNum in range(len(normalizedPoint)):
-                                if 8 >= pointNum >= 1 or 11 >= pointNum >= 10 or 14 >= pointNum >= 13:
-                                    self.keypointHistory[personNum][lines].append(normalizedPoint[pointNum][0])
-                                    self.keypointHistory[personNum][lines].append(normalizedPoint[pointNum][1])
+                                if 8 >= pointNum >= 1 or \
+                                        11 >= pointNum >= 10 or \
+                                        14 >= pointNum >= 13:
+                                    self.keypointHistory[
+                                        personNum
+                                    ][
+                                        lines
+                                    ].append(
+                                        normalizedPoint[pointNum][0]
+                                    )
+                                    self.keypointHistory[
+                                        personNum
+                                    ][
+                                        lines
+                                    ].append(
+                                        normalizedPoint[pointNum][1]
+                                    )
                         else:
-                            lstmPrediction = self.recognizeLSTM(self.keypointHistory[personNum])
+                            lstmPrediction = self.recognizeLSTM(
+                                self.keypointHistory[personNum]
+                            )
                             if lstmPrediction != 'none':
                                 retLSTM[num] = lstmPrediction
                                 self.keypointHistory.pop(personNum, None)
-                                self.writeVideo(personNum, lstmPrediction)
+                                # self.writeVideo(personNum, lstmPrediction)
                                 self.saveVideo[personNum].clear()
                                 continue
                             tmp = self.keypointHistory[personNum][1:]
@@ -110,10 +166,25 @@ class runNeuralNetwork:
                             del self.saveVideo[personNum][0]
                             self.saveVideo[personNum].append(frame)
                             for pointNum in range(len(normalizedPoint)):
-                                if 8 >= pointNum >= 1 or 11 >= pointNum >= 10 or 14 >= pointNum >= 13:
-                                    self.keypointHistory[personNum][lines].append(normalizedPoint[pointNum][0])
-                                    self.keypointHistory[personNum][lines].append(normalizedPoint[pointNum][1])
-        return retFrame, retLSTM
+                                if 8 >= pointNum >= 1 or \
+                                        11 >= pointNum >= 10 or \
+                                        14 >= pointNum >= 13:
+                                    self.keypointHistory[
+                                        personNum
+                                    ][
+                                        lines
+                                    ].append(
+                                        normalizedPoint[pointNum][0]
+                                    )
+                                    self.keypointHistory[
+                                        personNum
+                                    ][
+                                        lines
+                                    ].append(
+                                        normalizedPoint[pointNum][1]
+                                    )
+        self._odict = retLSTM
+        self._oimg = retFrame
 
     # Calculate the yolov3 return value to rectangle of the number
     def convertBack(self, x, y, w, h):
@@ -169,11 +240,23 @@ class runNeuralNetwork:
                 ret[i][0] = int(ret[i][0] - minX)
                 ret[i][1] = int(ret[i][1] - minY)
                 # resize coordinate to normalize image
-                ret[i][0] = int(round(ret[i][0] * (outputWidth / extractWidth)))
-                ret[i][1] = int(round(ret[i][1] * (outputHeight / extractHeight)))
+                ret[i][0] = int(
+                    round(
+                        ret[i][0] * (outputWidth / extractWidth)
+                    )
+                )
+                ret[i][1] = int(
+                    round(
+                        ret[i][1] * (outputHeight / extractHeight)
+                    )
+                )
 
-                ret[i][0] = ret[i][0] if ret[i][0] < outputWidth else outputWidth - 1
-                ret[i][1] = ret[i][1] if ret[i][1] < outputHeight else outputHeight - 1
+                ret[i][0] = ret[i][0] \
+                    if ret[i][0] < outputWidth \
+                    else outputWidth - 1
+                ret[i][1] = ret[i][1] \
+                    if ret[i][1] < outputHeight \
+                    else outputHeight - 1
 
         return ret, frame
 
@@ -222,19 +305,39 @@ class runNeuralNetwork:
             feetl_x = df['feetL_x'].values[i: i + time_steps]
             feetl_y = df['feetL_y'].values[i: i + time_steps]
 
-            segments.append([neck_x, neck_y, shoulderr_x, shoulderr_y, elbowr_x, elbowr_y,
-                             handr_x, handr_y, shoulderl_x, shoulderl_y, elbowl_x, elbowl_y, handl_x, handl_y,
-                             ass_x, ass_y, kneer_x, kneer_y, feetr_x, feetr_y,
-                             kneel_x, kneel_y, feetl_x, feetl_y])
+            segments.append(
+                [
+                    neck_x, neck_y, shoulderr_x, shoulderr_y,
+                    elbowr_x, elbowr_y, handr_x, handr_y,
+                    shoulderl_x, shoulderl_y, elbowl_x, elbowl_y,
+                    handl_x, handl_y, ass_x, ass_y,
+                    kneer_x, kneer_y, feetr_x, feetr_y,
+                    kneel_x, kneel_y, feetl_x, feetl_y
+                ]
+            )
 
-        reshaped_segments = np.asarray(segments, dtype=np.float32).reshape(-1, time_steps, n_features)
-        prediction = self.sessLSTM.run(self.y_LSTM, feed_dict={self.inputLSTM: reshaped_segments})
+        reshaped_segments = np.asarray(
+            segments,
+            dtype=np.float32
+        ).reshape(-1, time_steps, n_features)
+        prediction = self.sessLSTM.run(
+            self.y_LSTM,
+            feed_dict={
+                self.inputLSTM: reshaped_segments
+            }
+        )
         prediction = prediction[0]
-        if prediction[0] >= prediction[1] and prediction[0] >= prediction[2] and prediction[0] > 0.7:
+        if prediction[0] >= prediction[1] and \
+                prediction[0] >= prediction[2] and \
+                prediction[0] > 0.7:
             prediction = 'dribbling'
-        elif prediction[1] >= prediction[0] and prediction[1] >= prediction[2] and prediction[1] > 0.7:
+        elif prediction[1] >= prediction[0] and \
+                prediction[1] >= prediction[2] and \
+                prediction[1] > 0.7:
             prediction = 'layup'
-        elif prediction[2] >= prediction[0] and prediction[2] >= prediction[1] and prediction[2] > 0.7:
+        elif prediction[2] >= prediction[0] and \
+                prediction[2] >= prediction[1] and \
+                prediction[2] > 0.7:
             prediction = 'shooting'
         else:
             prediction = 'none'
@@ -255,10 +358,24 @@ class runNeuralNetwork:
         else:
             count = self.shootingCount
             self.shootingCount += 1
-        pathSave = os.path.join(pathSave, 'video_save', '{}{}-{}.mp4'.format(activity, str(count), personNum))
+        pathSave = os.path.join(
+            pathSave,
+            'video_save',
+            '{}{}-{}.mp4'.format(
+                activity,
+                str(count),
+                personNum
+            )
+        )
         height, width, channel = self.saveVideo[personNum][0].shape
         size = (width, height)
-        videoWriter = cv2.VideoWriter(pathSave, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), 30, size)
+        videoWriter = cv2.VideoWriter(
+            pathSave,
+            cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'),
+            30,
+            size
+        )
         for frame in self.saveVideo[personNum]:
+            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
             videoWriter.write(frame)
         videoWriter.release()

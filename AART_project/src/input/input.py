@@ -3,7 +3,7 @@ import wx
 import gettext
 
 class InputPanel(wx.Panel):
-	def __init__(self, parent, size, config):
+	def __init__(self, parent, size, config, nn):
 		wx.Panel.__init__(self, parent, size=size)
 
 		self.field = dict()
@@ -12,6 +12,7 @@ class InputPanel(wx.Panel):
 			self.field[i] = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
 		# textCtrl must contain wx.TE_PROCESS_ENTER => event: EVT_TEXT_ENTER
 
+		self.nn = nn
 		self.config = config
 		self.input = dict()
 		# store user input
@@ -131,16 +132,20 @@ class InputPanel(wx.Panel):
 		self.Show()
 
 	def onClear(self, event, buttonLabel):
-		self.input[buttonLabel] = ""
-		print(self.input)
+		self.input.pop(buttonLabel)
+		# pass dict to neural network
+		self.nn._idict = self.input
+		if not self.input:
+			self.nn._imode = 0
 
 	def onEnter(self, event, buttonLabel):
 		input_t = self.field[buttonLabel].GetValue()
 
-		self.input[buttonLabel] = input_t \
-			if self.inputCheck(input_t) \
-			else self.input.get(buttonLabel, "")
-		print(self.input)
+		if self.inputCheck(input_t):
+			self.input[buttonLabel] = input_t
+			# pass dict to neural network
+			self.nn._idict = self.input
+			self.nn._imode = 1
 
 	def inputCheck(self, input):
 		return str(input).isdigit()

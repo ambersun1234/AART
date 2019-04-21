@@ -9,8 +9,12 @@ from src.media.media import MediaPanel
 from src.output.output import OutputTextPanel, OutputPicPanel
 from src.welcome.welcome import WelcomeGuide
 from src.config.configJSON import Config
+from src.neuralNetwork.prediction import runNeuralNetwork
 
 import gettext
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+# show error only
 
 class Frame(wx.Frame):
 	def __init__(self, parent):
@@ -20,6 +24,7 @@ class Frame(wx.Frame):
 		self.initSize()
 
 		self.config = Config(os.path.abspath(__file__))
+		self.nn = runNeuralNetwork()
 
 		# set language
 		lang = "tw" if self.config.loadedConfig["language"] == "tw" else "en"
@@ -42,7 +47,8 @@ class Frame(wx.Frame):
 				self.currentScreenY * 0.7
 			),
 			config=self.config,
-			path=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+			path=os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+			nn=self.nn
 		)
 		self.OutputPicPanel = OutputPicPanel(
 			self,
@@ -50,7 +56,8 @@ class Frame(wx.Frame):
 				self.currentScreenX * 0.7,
 				self.currentScreenY * 0.3
 			),
-			config=self.config
+			config=self.config,
+			nn=self.nn
 		)
 
 		self.inputPanel = InputPanel(
@@ -59,7 +66,8 @@ class Frame(wx.Frame):
 				self.currentScreenX * 0.3,
 				self.currentScreenY * 0.3
 			),
-			config=self.config
+			config=self.config,
+			nn=self.nn
 		)
 		self.OutputTextPanel = OutputTextPanel(
 			self,
@@ -67,7 +75,8 @@ class Frame(wx.Frame):
 				self.currentScreenX * 0.3,
 				self.currentScreenY * 0.7
 			),
-			config=self.config
+			config=self.config,
+			nn=self.nn
 		)
 
 		self.welcome = WelcomeGuide(
