@@ -229,7 +229,17 @@ class runNeuralNetwork:
         minX = minX - 5 if minX - 5 > 0 else 0
         maxX = maxX + 5 if maxX + 5 < width else width - 1
 
-        frame = self.outputFrame[minY:maxY, minX:maxX].copy()
+        # Make output specific person picture beautiful
+        frameOutMinY = minY
+        frameOutMaxY = maxY
+        if keypoints[1][2] != 0 and keypoints[8][2] != 0:
+            minYTmp = int(keypoints[1][1] - (keypoints[8][1] - keypoints[1][1]))
+            maxYTmp = int(keypoints[8][1] + (keypoints[8][1] - keypoints[1][1])) * 5
+            frameOutMinY = minYTmp if minYTmp > 0 else 0
+            frameOutMaxY = maxYTmp if maxYTmp < height else height - 1
+
+        frame = self.outputFrame[frameOutMinY:frameOutMaxY, minX:maxX].copy()
+
         ret = ret.astype(int)
         extractHeight = maxY - minY
         extractWidth = maxX - minX
