@@ -54,6 +54,7 @@ class OutputTextPanel(wx.Panel):
 					size=(self.currentWidth, self.config.loadedConfig["fontSize"])
 				)
 				text.SetForegroundColour(self.config.loadedConfig["colorText"])
+				text.SetBackgroundColour("black")
 				text.SetFont(
 					wx.Font(
 						self.config.loadedConfig["fontSize"],
@@ -64,7 +65,6 @@ class OutputTextPanel(wx.Panel):
 				)
 				self.spbox.Add(text, flag=wx.EXPAND | wx.ALL, proportion=5)
 				pos += 30
-
 		self.sp.SetSizer(self.spbox)
 
 	def initUI(self):

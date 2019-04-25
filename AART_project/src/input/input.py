@@ -10,6 +10,7 @@ class InputPanel(wx.Panel):
 		for i in range(0, 3):
 			# self.field.append(wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER))
 			self.field[i] = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+			self.field[i].SetValue("")
 		# textCtrl must contain wx.TE_PROCESS_ENTER => event: EVT_TEXT_ENTER
 
 		self.nn = nn
@@ -132,7 +133,8 @@ class InputPanel(wx.Panel):
 		self.Show()
 
 	def onClear(self, event, buttonLabel):
-		self.input.pop(buttonLabel)
+		self.input.pop(buttonLabel, "")
+		self.field[buttonLabel].SetValue("")
 		# pass dict to neural network
 		self.nn._idict = self.input
 		if not self.input:
@@ -146,6 +148,8 @@ class InputPanel(wx.Panel):
 			# pass dict to neural network
 			self.nn._idict = self.input
 			self.nn._imode = 1
+		else:
+			self.field[buttonLabel].SetValue("")
 
 	def inputCheck(self, input):
 		return str(input).isdigit()

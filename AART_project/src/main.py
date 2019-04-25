@@ -11,6 +11,8 @@ from src.welcome.welcome import WelcomeGuide
 from src.config.configJSON import Config
 from src.neuralNetwork.prediction import runNeuralNetwork
 
+import gc
+
 import gettext
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
@@ -193,12 +195,15 @@ class Frame(wx.Frame):
 		)  # english
 
 	def onChangeLane(self, event, lang):
-		self.config.storeLang(lang)
-		self.config.save()
-		self.onRestart(event)
+		if not lang == self.config.loadedConfig["language"]:
+			self.config.storeLang(lang)
+			self.config.save()
+			self.onRestart(event)
 
 	def onRestart(self, event):
 		# restart program
+		gc.collect()
+		sys.stdout.flush()
 		os.execl(sys.executable, "python", __file__, *sys.argv[1:])
 
 	def onSelectCamera(self, event):
