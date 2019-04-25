@@ -204,7 +204,12 @@ class Frame(wx.Frame):
 		# restart program
 		gc.collect()
 		sys.stdout.flush()
-		os.execl(sys.executable, "python", __file__, *sys.argv[1:])
+		os.execl(
+			os.path.abspath("../venv/bin/python"),
+			"python",
+			__file__,
+			*sys.argv[1:]
+		)
 
 	def onSelectCamera(self, event):
 		dialog = SelectDeviceDialog(
@@ -232,11 +237,17 @@ class Frame(wx.Frame):
 				self.config.save()
 
 		dialog.Destroy()
+		os.chdir(defaultPath)
 
 	def onQuit(self, event):
 		self.Close()
 
 if __name__ == '__main__':
+	# prevent program automatically
+	# change current working directory by itself
+	global defaultPath
+	defaultPath = os.getcwd()
+
 	app = wx.App()
 	frame = Frame(None)
 	app.MainLoop()
