@@ -51,7 +51,7 @@ class PreviewCamera(wx.Panel):
 			self.Refresh()
 
 class MediaFrame(wx.Panel):
-	def __init__(self, parent, size, config, nn):
+	def __init__(self, parent, size, config, nn, ot, op):
 		wx.Panel.__init__(self, parent, size=size)
 		self.config = config
 		self.mediaBar = None
@@ -64,6 +64,10 @@ class MediaFrame(wx.Panel):
 		self.videoPath = ""
 		self.type = {"webcam": 0, "video": 1}
 		self.nn = nn
+
+		# output panel
+		self.ot = ot
+		self.op = op
 
 		# set language
 		lang = "tw" if self.config.loadedConfig["language"] == "tw" else "en"
@@ -225,12 +229,24 @@ class MediaFrame(wx.Panel):
 				self.control = True
 				self.mediaBar.controlButton.SetBitmap(self.mediaBar.pauseImg)
 				self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+
+				# play output text & output picture
+				self.ot.timer.Start(1000. / self.ot.fps)
+				self.op.timer.Start(1000. / self.op.fps)
 			else:
 				if self.control:
 					self.timer.Stop()
+
+					# pause output text & output picture
+					self.ot.timer.Stop()
+					self.op.timer.Stop()
 					self.mediaBar.controlButton.SetBitmap(self.mediaBar.playImg)
 				else:
 					self.timer.Start(1000. / self.fps)
+
+					# play output text & output picture
+					self.ot.timer.Start(1000. / self.ot.fps)
+					self.op.timer.Start(1000. / self.op.fps)
 					self.mediaBar.controlButton.SetBitmap(self.mediaBar.pauseImg)
 				self.control = not self.control
 
@@ -292,7 +308,7 @@ class MediaFrame(wx.Panel):
 			self.iterate()
 
 class MediaBar(wx.Panel):
-	def __init__(self, parent, size, config, mediaFrame, path):
+	def __init__(self, parent, size, config, mediaFrame, path, ot, op):
 		wx.Panel.__init__(self, parent, size=size)
 		self.config = config
 		self.mediaFrame = mediaFrame
@@ -301,6 +317,10 @@ class MediaBar(wx.Panel):
 		self.width, self.height = self.GetSize()
 		self.slider = None
 		self.imgPath = path
+
+		# output panel
+		self.ot = ot
+		self.op = op
 
 		# video time bar
 		self.startTime = {"h": 0, "m": 0, "s": 0}
@@ -523,6 +543,10 @@ class MediaBar(wx.Panel):
 			self.slider.GetValue() == self.slider.GetMax():
 			self.slider.SetValue(0)
 			self.mediaFrame.timer.Start(1000. / self.mediaFrame.fps)
+
+			# play output text & output picture
+			self.ot.timer.Start(1000. / self.ot.fps)
+			self.op.timer.Start(1000. / self.op.fps)
 			# self.mediaFrame.control = True
 			self.controlButton.SetBitmap(self.pauseImg)
 			self.mediaFrame.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
@@ -532,17 +556,27 @@ class MediaBar(wx.Panel):
 			# pause or play check based on self.control
 			if self.mediaFrame.control:
 				self.mediaFrame.timer.Stop()
+
+				# play output text & output picture
+				self.ot.timer.Stop()
+				self.op.timer.Stop()
+
 				# self.controlButton.SetLabel(_("Play"))
 				self.controlButton.SetBitmap(self.playImg)
 			else:
 				self.mediaFrame.timer.Start(1000. / self.mediaFrame.fps)
+
+				# play output text & output picture
+				self.ot.timer.Start(1000. / self.ot.fps)
+				self.op.timer.Start(1000. / self.op.fps)
+
 				# self.controlButton.SetLabel(_("Pause"))
 				self.controlButton.SetBitmap(self.pauseImg)
 			self.mediaFrame.control = not self.mediaFrame.control
 		self.mediaFrame.SetFocus()
 
 class MediaPanel(wx.Panel):
-	def __init__(self, parent, size, config, path, nn):
+	def __init__(self, parent, size, config, path, nn, ot, op):
 		# frame display size
 		w, h = size
 		frameSize = (w, h * 0.95)
@@ -550,19 +584,25 @@ class MediaPanel(wx.Panel):
 		wx.Panel.__init__(self, parent, size=size)
 		self.type = {"webcam": 0, "video": 1}
 		self.nn = nn
+		self.ot = ot
+		self.op = op
 
 		self.mediaFrame = MediaFrame(
 			self,
 			size=frameSize,
 			config=config,
-			nn=self.nn
+			nn=self.nn,
+			op=self.op,
+			ot=self.ot
 		)
 		self.mediaBar = MediaBar(
 			self,
 			size=barSize,
 			config=config,
 			mediaFrame=self.mediaFrame,
-			path=path
+			path=path,
+			op=self.op,
+			ot=self.ot
 		)
 
 		# Caution: use it carefully,

@@ -19,7 +19,7 @@ class OutputTextPanel(wx.Panel):
 		self.currentWidth = self.GetSize()[1]
 
 		# dynamically get text from LSTM
-		self.fps = 20
+		self.fps = 10
 		self.timer = wx.Timer(self)
 		self.timer.Start(1000. / self.fps)
 
@@ -45,13 +45,20 @@ class OutputTextPanel(wx.Panel):
 				)
 			)
 			self.spbox.Clear(True)
-			pos = 0
+			check = True
 			for number, posture in od.items():
+				# up and down space
+				if not check:
+					self.spbox.AddSpacer(10)
+				else:
+					self.spbox.AddSpacer(5)
+
+				hbox = wx.BoxSizer(wx.HORIZONTAL)
+
+				# text first part
 				text = wx.StaticText(
 					self.sp,
-					label="   {} {}: {}".format(_("Athlete"), number, _(posture)),
-					pos=(0, pos),
-					size=(self.currentWidth, self.config.loadedConfig["fontSize"])
+					label=" {} {}: ".format(_("Athlete"), number)
 				)
 				text.SetForegroundColour(self.config.loadedConfig["colorText"])
 				text.SetBackgroundColour("black")
@@ -63,9 +70,32 @@ class OutputTextPanel(wx.Panel):
 						weight=wx.NORMAL
 					)
 				)
-				self.spbox.Add(text, flag=wx.EXPAND | wx.ALL, proportion=5)
-				pos += 30
+
+				# text second part
+				text2 = wx.StaticText(
+					self.sp,
+					label="{}".format(_(posture))
+				)
+				text2.SetForegroundColour(self.config.loadedConfig["colorText"])
+				text2.SetFont(
+					wx.Font(
+						self.config.loadedConfig["fontSize"],
+						family=wx.DEFAULT,
+						style=wx.NORMAL,
+						weight=wx.NORMAL
+					)
+				)
+
+				# hbox part
+				hbox.AddSpacer(20)
+				hbox.Add(text)
+				hbox.AddSpacer(5)
+				hbox.Add(text2)
+
+				self.spbox.Add(hbox)
+
 		self.sp.SetSizer(self.spbox)
+		self.sp.SetupScrolling()
 
 	def initUI(self):
 		self.SetBackgroundColour(
@@ -107,39 +137,10 @@ class OutputTextPanel(wx.Panel):
 		# dynamically change output text
 		self.Bind(wx.EVT_TIMER, self.onTimer)
 
-		check = False
-		for key, value in self.text.items():
-			if not key == "empty" or not value == "empty":
-				temp = wx.StaticText(
-					self.sp,
-					label="   {} {}: {}".format(_("Athlete"), _(key), _(value)),
-					size=(-1, self.config.loadedConfig["fontSize"] + 17)
-				)
-			else:
-				temp = wx.StaticText(
-					self.sp,
-					label="",
-					size=(-1, self.config.loadedConfig["fontSize"] + 17)
-				)
-			temp.SetForegroundColour(
-				self.config.loadedConfig["colorText"]
-			)
-			temp.SetFont(wx.Font(
-				self.config.loadedConfig["fontSize"],
-				family=wx.DEFAULT,
-				style=wx.NORMAL,
-				weight=wx.NORMAL)
-			)
-			if check:
-				self.spbox.AddSpacer(5)
-			else:
-				check = True
-			self.spbox.Add(temp, flag=wx.EXPAND | wx.ALL)
-
 		self.sp.SetSizer(self.spbox)
 		self.sp.SetAutoLayout(1)
 		self.sp.SetupScrolling()
-		vbox.Add(self.sp, flag=wx.ALL)
+		vbox.Add(self.sp)
 
 		self.SetSizer(vbox)
 		self.Show()
@@ -153,9 +154,12 @@ class OutputPicPanel(wx.Panel):
 		self.nn = nn
 
 		self.w, self.h = self.GetSize()
+		self.tw = math.floor(self.w * 0.14)
+		self.uh = math.floor(self.h * 0.1)
+		self.dh = math.floor(self.h * 0.65)
 
 		# dynamically get image from LSTM
-		self.fps = 20
+		self.fps = 10
 		self.timer = wx.Timer(self)
 		self.timer.Start(1000. / self.fps)
 		# binding event below, dynamic width and height
@@ -184,17 +188,17 @@ class OutputPicPanel(wx.Panel):
 			)
 			self.spbox.Clear(True)
 			posx = 0
-			count = math.floor(self.w * 0.14)
 			for number, img in od.items():
 				tsizer = wx.BoxSizer(wx.VERTICAL)
 
 				# make bmp
-				img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 				img = cv2.resize(
 					img,
-					(count, self.h - offset),
+					(self.tw, self.dh),
 					interpolation=cv2.INTER_CUBIC
 				)
+				# cv2.imshow(number, img)
+				img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 				img = Image.fromarray(img, "RGB")
 				w, h = img.size
 				temp = wx.Bitmap.FromBuffer(w, h, img.tobytes())
@@ -202,9 +206,8 @@ class OutputPicPanel(wx.Panel):
 				# make text
 				text = wx.StaticText(
 					self.sp,
-					label="   {}: {}".format(_("Athlete"), number),
-					pos=(posx, 0),
-					size=(self.w * 0.14, 10)
+					label="  {}: {}".format(_("Athlete"), number),
+					pos=(posx, 0)
 				)
 				text.SetForegroundColour(self.config.loadedConfig["colorText"])
 				text.SetBackgroundColour("black")
@@ -216,24 +219,37 @@ class OutputPicPanel(wx.Panel):
 						weight=wx.NORMAL
 					)
 				)
+				text.Center()
+				tbmp = wx.StaticBitmap(
+					self.sp,
+					bitmap=temp,
+					pos=(posx, self.uh + 2)
+				)
+
+				# set min width
+				if text.GetSize()[0] < 140:
+					text.SetMinSize(wx.Size(self.tw, text.GetSize()[1] + 10))
+				else:
+					tbmp.SetMinSize(wx.Size(text.GetSize()[0], tbmp.GetSize()[1]))
 
 				# make sizer
 				tsizer.Add(
 					text,
 					flag=wx.CENTER | wx.ALIGN_CENTER
 				)
+				tsizer.AddSpacer(5)
 				tsizer.Add(
-					wx.StaticBitmap(
-						self.sp,
-						bitmap=temp,
-						pos=(posx, offset - 9)
-					),
+					tbmp,
 					flag=wx.BOTTOM | wx.ALIGN_BOTTOM,
 					proportion=1
 				)
-				posx += (count + 10)
+
 				self.spbox.Add(tsizer)
+				self.spbox.AddSpacer(10)
+			# self.timer.Stop()
+			# cv2.waitKey(0)
 		self.sp.SetSizer(self.spbox)
+		self.sp.SetupScrolling(scroll_y=False)
 
 	def initUI(self):
 		self.SetBackgroundColour(
@@ -273,7 +289,7 @@ class OutputPicPanel(wx.Panel):
 
 		self.sp.SetSizer(self.spbox)
 		self.sp.SetAutoLayout(1)
-		self.sp.SetupScrolling()
+		self.sp.SetupScrolling(scroll_y=False)
 		vbox.Add(self.sp, flag=wx.ALL)
 
 		# dynamic image layout

@@ -156,7 +156,7 @@ class runNeuralNetwork:
                             if lstmPrediction != 'none':
                                 retLSTM[num] = lstmPrediction
                                 self.keypointHistory.pop(personNum, None)
-                                # self.writeVideo(personNum, lstmPrediction)
+                                self.writeVideo(personNum, lstmPrediction)
                                 self.saveVideo[personNum].clear()
                                 continue
                             tmp = self.keypointHistory[personNum][1:]
@@ -233,8 +233,13 @@ class runNeuralNetwork:
         frameOutMinY = minY
         frameOutMaxY = maxY
         if keypoints[1][2] != 0 and keypoints[8][2] != 0:
-            minYTmp = int(keypoints[1][1] - (keypoints[8][1] - keypoints[1][1]))
-            maxYTmp = int(keypoints[8][1] + (keypoints[8][1] - keypoints[1][1])) * 5
+            minYTmp = int(
+                keypoints[1][1] - (keypoints[8][1] - keypoints[1][1])
+            )
+            maxYTmp = int(
+                keypoints[8][1] + (keypoints[8][1] - keypoints[1][1])
+            )
+            maxYTmp *= 5
             frameOutMinY = minYTmp if minYTmp > 0 else 0
             frameOutMaxY = maxYTmp if maxYTmp < height else height - 1
 

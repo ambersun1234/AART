@@ -42,16 +42,6 @@ class Frame(wx.Frame):
 		# set title
 		self.SetTitle(title=_("Athlete Analysis of Real Time Sports Events( AART )"))
 
-		self.mediaPanel = MediaPanel(
-			self,
-			size=(
-				self.currentScreenX * 0.7,
-				self.currentScreenY * 0.7
-			),
-			config=self.config,
-			path=os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-			nn=self.nn
-		)
 		self.OutputPicPanel = OutputPicPanel(
 			self,
 			size=(
@@ -79,6 +69,19 @@ class Frame(wx.Frame):
 			),
 			config=self.config,
 			nn=self.nn
+		)
+
+		self.mediaPanel = MediaPanel(
+			self,
+			size=(
+				self.currentScreenX * 0.7,
+				self.currentScreenY * 0.7
+			),
+			config=self.config,
+			path=os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+			nn=self.nn,
+			ot=self.OutputTextPanel,
+			op=self.OutputPicPanel
 		)
 
 		self.welcome = WelcomeGuide(
