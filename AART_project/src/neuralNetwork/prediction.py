@@ -391,6 +391,5 @@ class runNeuralNetwork:
             size
         )
         for frame in self.saveVideo[personNum]:
-            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
             videoWriter.write(frame)
         videoWriter.release()
