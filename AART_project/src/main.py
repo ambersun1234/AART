@@ -207,8 +207,9 @@ class Frame(wx.Frame):
 		# restart program
 		gc.collect()
 		sys.stdout.flush()
+		# sys.executable: find current python interpreter
 		os.execl(
-			os.path.abspath("../venv/bin/python"),
+			os.path.abspath(sys.executable),
 			"python",
 			__file__,
 			*sys.argv[1:]
