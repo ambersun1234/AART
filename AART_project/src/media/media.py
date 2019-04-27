@@ -622,7 +622,15 @@ class MediaPanel(wx.Panel):
 
 	def doLoad(self, path):
 		self.mediaFrame.load(path, self.type["video"])
+		self.outputReinit()
 
 	def doSelect(self, capID):
 		if not capID == -1:
 			self.mediaFrame.select(capID, self.type["webcam"])
+			self.outputReinit()
+
+	def outputReinit(self):
+		self.op.spbox.Clear(True)
+		self.ot.spbox.Clear(True)
+		self.op.sp.SetSizer(self.op.spbox)
+		self.ot.sp.SetSizer(self.ot.spbox)

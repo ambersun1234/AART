@@ -222,6 +222,7 @@ class Frame(wx.Frame):
 		)
 		dialog.ShowModal()
 		self.mediaPanel.doSelect(int(dialog.deviceID))
+		self.inputPanel.inputReinit()
 		dialog.Destroy()
 
 	def onOpenVideo(self, event):
@@ -236,6 +237,7 @@ class Frame(wx.Frame):
 			paths = dialog.GetPaths()
 			for path in paths:
 				self.mediaPanel.doLoad(path)
+				self.inputPanel.inputReinit()
 				self.config.storePath(path)
 				self.config.save()
 

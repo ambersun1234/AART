@@ -156,3 +156,9 @@ class InputPanel(wx.Panel):
 
 	def inputCheck(self, input):
 		return str(input).isdigit()
+
+	def inputReinit(self):
+		self.input = dict()
+		self.nn._imode = 0
+		for i in range(0, 3):
+			self.field[i].SetValue("")
