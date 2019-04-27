@@ -150,6 +150,9 @@ class InputPanel(wx.Panel):
 			self.nn._imode = 1
 		else:
 			self.field[buttonLabel].SetValue("")
+			self.input.pop(buttonLabel, None)
+			if not self.input:
+				self.nn._imode = 0
 
 	def inputCheck(self, input):
 		return str(input).isdigit()
