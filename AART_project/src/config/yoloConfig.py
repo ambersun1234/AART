@@ -3,11 +3,12 @@ import os
 # jersyTracking.py
 defaultModelFolder = os.path.expanduser("~/library/openpose/models/")
 darknetCfg = os.path.abspath("../yolov3TrainingSrc/yolov3.cfg")
-darnetWeights = os.path.abspath("../yolov3_weights/yolov3_20000.weights")
+darnetWeights = os.path.abspath("../yolov3_weights/yolov3_40000.weights")
 darknetData = os.path.abspath("../yolov3TrainingSrc/obj.data")
 
 # darknet.py
-darknetDir = os.path.abspath("../") + "/"
+# darknetDir = os.path.abspath("../") + "/"
+darknetDir = '/home/louisme/library/darknet/'
 
 # obj.data
 arr = dict.fromkeys(
@@ -24,7 +25,7 @@ arr["trainLocation"] = os.path.abspath("../yolov3TrainingSrc/train.txt")
 arr["validLocation"] = os.path.abspath("../yolov3TrainingSrc/test.txt")
 arr["namesLocation"] = os.path.abspath("../yolov3TrainingSrc/obj.names")
 arr["backupLocation"] = os.path.abspath(
-	"../yolov3_weights/yolov3_20000.weights"
+	"../yolov3_weights/yolov3_40000.weights"
 )
 
 
