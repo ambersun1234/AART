@@ -8,6 +8,7 @@ import cv2
 from sklearn import metrics
 
 from src.darknet import *
+from src.config.yoloConfig import *
 
 try:
     sys.path.append('/usr/local/python')
@@ -391,5 +392,6 @@ class runNeuralNetwork:
             size
         )
         for frame in self.saveVideo[personNum]:
+
             videoWriter.write(frame)
         videoWriter.release()

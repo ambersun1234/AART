@@ -1,5 +1,5 @@
 classes=1
-train=/media/ambersun/gitRepo/AART/AART_project/yolov3TrainingSrc/number20/train.txt
-valid=/media/ambersun/gitRepo/AART/AART_project/yolov3TrainingSrc/number20/test.txt
-names=/media/ambersun/gitRepo/AART/AART_project/yolov3TrainingSrc/number20/obj.names
-backup=/media/ambersun/gitRepo/AART/AART_project/yolov3_weights/yolov3_100002.weights
+train=/home/louisme/library/yolov3/AART_project/yolov3TrainingSrc/number20/train.txt
+valid=/home/louisme/library/yolov3/AART_project/yolov3TrainingSrc/number20/test.txt
+names=/home/louisme/library/yolov3/AART_project/yolov3TrainingSrc/number20/obj.names
+backup=/home/louisme/library/yolov3/AART_project/yolov3_weights/yolov3_100002.weights
