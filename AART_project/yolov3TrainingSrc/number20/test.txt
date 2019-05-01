@@ -1,0 +1,5 @@
+/home/louisme/library/darknet/jerseyNumber/yolos/009.jpg
+/home/louisme/library/darknet/jerseyNumber/yolos/004.jpg
+/home/louisme/library/darknet/jerseyNumber/yolos/010.jpg
+/home/louisme/library/darknet/jerseyNumber/yolos/011.jpg
+/home/louisme/library/darknet/jerseyNumber/yolos/012.jpg
