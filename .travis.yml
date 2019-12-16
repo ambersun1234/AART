@@ -1,0 +1,15 @@
+dist: xenial
+language: python
+
+before_install:
+  - npm install -g pyright
+
+install:
+  - find $TRAVIS_BUILD_DIR/ -type f -name "*.py" -exec pyright --dependencies cv2 OpenPose {} \;
+
+notifications:
+  email:
+    recipients:
+      ambersun1019.shawn@gmail.com
+    on_success: never
+    on_failure: always
