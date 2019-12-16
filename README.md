@@ -1,7 +1,8 @@
 # Athlete analysis of real time sports events( AART )
 [![Build Status](https://travis-ci.com/ambersun1234/AART.svg?token=e57vJgMEsZsXRodR9BkR&branch=master)](https://travis-ci.com/ambersun1234/AART)
-<br>
-**AART** represented the athlete posture identification and tracking on video and webcam.
+[![License](https://img.shields.io/badge/License-aart-lightgray)](./LICENSE)
+
+**AART** represents the athlete posture identification and tracking on video and webcam.
 
 ### Features
 + Real time athlete analysis
@@ -11,7 +12,7 @@
 
 ### Clone repo
 ```=1
-git clone git@github.com:ambersun1234/AART.git
+git clone https://github.com/ambersun1234/AART.git
 ```
 
 ### Running
@@ -38,6 +39,18 @@ autopep8 --in-place --global-config ~/.config/pep8 AART_project/src/main.py
 ### Author
 + [ambersun1234](https://github.com/ambersun1234)
 + [louisme87](https://github.com/louisme87)
+
+### Contributors
++ [Fofo](https://github.com/jr00138017)
++ [s1123527](https://github.com/s1123527)
++ [snowmintowo](https://github.com/snowmint)
++ [wayne6172](https://github.com/wayne6172)
++ u10506106@ms.ttu.edu.tw
++ u10506107@ms.ttu.edu.tw
++ u10506125@ms.ttu.edu.tw
++ u10506131@ms.ttu.edu.tw
++ u10506123@ms.ttu.edu.tw
++ u10506151@ms.ttu.edu.tw
 
 ### License
 + This project is licensed under other license - see the [Other License](./LICENSE) file for detail
