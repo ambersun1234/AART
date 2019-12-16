@@ -1,9 +1,10 @@
 from ctypes import *
-import math
 import random
 import numpy as np
 
-from src.config.yoloConfig import number,number20
+import math
+from config.yoloConfig import number, number20
+# AART_project/src/config
 # 導入各自機器的檔案路徑
 
 def sample(probs):
@@ -58,26 +59,8 @@ class METADATA(Structure):
 		("names", POINTER(c_char_p))
 	]
 
-
-
-
-
-
-
-
-
-
 darknet = number()
 # darknet = number20()
-
-
-
-
-
-
-
-
-
 
 darknet.config()
 defaultModelFolder = darknet.defaultModelFolder

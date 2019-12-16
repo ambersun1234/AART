@@ -2,7 +2,11 @@ GIT_HOOKS := .git/hooks/applied
 SRC := AART_project/src
 LCTW := AART_project/src/locales/tw/LC_MESSAGES
 LCEN := AART_project/src/locales/en/LC_MESSAGES
+
 hook: ${GIT_HOOKS}
+
+aart: 
+	@cd AART_project/src && python3 main.py || exit 1
 
 $(GIT_HOOKS):
 	@bash ./scripts/install-git-hooks

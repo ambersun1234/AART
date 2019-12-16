@@ -7,8 +7,8 @@ import os
 import cv2
 from sklearn import metrics
 
-from src.darknet import *
-from src.config.yoloConfig import *
+from darknet import *
+from config.yoloConfig import *
 
 try:
     sys.path.append('/usr/local/python')
@@ -81,7 +81,7 @@ class runNeuralNetwork:
         self.opWrapper.emplaceAndPop([self.datum])
         try:
             lala = len(keypoints)
-        except:
+        except BaseException as e:
             return
 
         self.outputFrame = self.datum.cvOutputData

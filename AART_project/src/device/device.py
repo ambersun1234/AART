@@ -3,7 +3,7 @@ import subprocess
 
 import os
 
-from src.media.media import PreviewCamera
+from media.media import PreviewCamera
 
 import gettext
 
