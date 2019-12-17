@@ -115,75 +115,35 @@ class runNeuralNetwork:
                     retFrame[str(num)] = poseture
                     # Save the keypoints to the txt for LSTM detect
                     if personNum not in self.keypointHistory:
+                        lines = 0
                         self.keypointHistory[personNum] = [[]]
                         self.saveVideo[personNum] = [frame]
-                        for pointNum in range(len(normalizedPoint)):
-                            if 8 >= pointNum >= 1 or \
-                                    11 >= pointNum >= 10 or \
-                                    14 >= pointNum >= 13:
-                                self.keypointHistory[personNum][0].append(
-                                    normalizedPoint[pointNum][0]
-                                )
-                                self.keypointHistory[personNum][0].append(
-                                    normalizedPoint[pointNum][1]
-                                )
                     else:
                         lines = len(self.keypointHistory[personNum])
-                        if lines < 61:
-                            self.keypointHistory[personNum].append([])
-                            self.saveVideo[personNum].append(frame)
-                            for pointNum in range(len(normalizedPoint)):
-                                if 8 >= pointNum >= 1 or \
-                                        11 >= pointNum >= 10 or \
-                                        14 >= pointNum >= 13:
-                                    self.keypointHistory[
-                                        personNum
-                                    ][
-                                        lines
-                                    ].append(
-                                        normalizedPoint[pointNum][0]
-                                    )
-                                    self.keypointHistory[
-                                        personNum
-                                    ][
-                                        lines
-                                    ].append(
-                                        normalizedPoint[pointNum][1]
-                                    )
-                        else:
-                            lstmPrediction = self.recognizeLSTM(
-                                self.keypointHistory[personNum]
+                        self.keypointHistory[personNum].append([])
+                        self.saveVideo[personNum].append(frame)
+
+                    for pointNum in range(len(normalizedPoint)):
+                        # 擷取所需骨架
+                        if 8 >= pointNum >= 1 or \
+                                11 >= pointNum >= 10 or \
+                                14 >= pointNum >= 13:
+                            self.keypointHistory[personNum][lines].append(
+                                normalizedPoint[pointNum][0]
                             )
-                            if lstmPrediction != 'none':
-                                retLSTM[num] = lstmPrediction
-                                self.keypointHistory.pop(personNum, None)
-                                self.writeVideo(personNum, lstmPrediction)
-                                self.saveVideo[personNum].clear()
-                                continue
-                            tmp = self.keypointHistory[personNum][1:]
-                            lines = 60
-                            self.keypointHistory[personNum] = tmp
-                            self.keypointHistory[personNum].append([])
-                            del self.saveVideo[personNum][0]
-                            self.saveVideo[personNum].append(frame)
-                            for pointNum in range(len(normalizedPoint)):
-                                if 8 >= pointNum >= 1 or \
-                                        11 >= pointNum >= 10 or \
-                                        14 >= pointNum >= 13:
-                                    self.keypointHistory[
-                                        personNum
-                                    ][
-                                        lines
-                                    ].append(
-                                        normalizedPoint[pointNum][0]
-                                    )
-                                    self.keypointHistory[
-                                        personNum
-                                    ][
-                                        lines
-                                    ].append(
-                                        normalizedPoint[pointNum][1]
-                                    )
+                            self.keypointHistory[personNum][lines].append(
+                                normalizedPoint[pointNum][1]
+                            )
+                    lstmPrediction = self.recognizeLSTM(
+                        self.keypointHistory[personNum]
+                    )
+                    print(lstmPrediction)
+                    if lstmPrediction == 'shooting':
+                        retLSTM[num] = lstmPrediction
+                        self.keypointHistory.pop(personNum, None)
+                        self.writeVideo(personNum, lstmPrediction)
+                        self.saveVideo[personNum].clear()
+                        continue
         self._odict = retLSTM
         self._oimg = retFrame
 
@@ -291,7 +251,7 @@ class runNeuralNetwork:
                    'feetL_x', 'feetL_y']
         df = DataFrame(data=list, columns=columns)
 
-        time_steps = 60
+        time_steps = 10
         # 50 data for one input
         n_features = 24
         segments = []
@@ -342,20 +302,17 @@ class runNeuralNetwork:
                 self.inputLSTM: reshaped_segments
             }
         )
-        prediction = prediction[0]
-        if prediction[0] >= prediction[1] and \
-                prediction[0] >= prediction[2] and \
-                prediction[0] > 0.7:
-            prediction = 'dribbling'
-        elif prediction[1] >= prediction[0] and \
-                prediction[1] >= prediction[2] and \
-                prediction[1] > 0.7:
-            prediction = 'layup'
-        elif prediction[2] >= prediction[0] and \
-                prediction[2] >= prediction[1] and \
-                prediction[2] > 0.7:
-            prediction = 'shooting'
-        else:
+        try:
+            prediction = prediction[0]
+            if prediction[0] >= prediction[1] and \
+                    prediction[0] > 0.7:
+                prediction = 'dribbling'
+            elif prediction[1] >= prediction[0] and \
+                    prediction[1] > 0.7:
+                prediction = 'shooting'
+            else:
+                prediction = 'none'
+        except:
             prediction = 'none'
 
         return prediction

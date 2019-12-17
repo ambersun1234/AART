@@ -1,5 +1,5 @@
-classes=15
-train=/home/louisme/library/yolov3/AART_project/yolov3TrainingSrc/train.txt
-valid=/home/louisme/library/yolov3/AART_project/yolov3TrainingSrc/test.txt
-names=/home/louisme/library/yolov3/AART_project/yolov3TrainingSrc/obj.names
-backup=/home/louisme/library/yolov3/AART_project/yolov3_weights/yolov3_40000.weights
+classes=7
+train=/home/aart/GitRepo/AART/AART_project/yolov3TrainingSrc/train.txt
+valid=/home/aart/GitRepo/AART/AART_project/yolov3TrainingSrc/test.txt
+names=/home/aart/GitRepo/AART/AART_project/yolov3TrainingSrc/obj.names
+backup=/home/aart/GitRepo/AART/AART_project/yolov3_weights/yolov3_40000.weights

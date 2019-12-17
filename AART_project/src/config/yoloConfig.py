@@ -4,11 +4,11 @@ class number():
 	def __init__(self):
 		self.defaultModelFolder = os.path.expanduser("~/library/openpose/models/")
 		self.darknetCfg = os.path.abspath("../yolov3TrainingSrc/yolov3.cfg")
-		self.darnetWeights = os.path.abspath("../yolov3_weights/yolov3_40000.weights")
+		self.darnetWeights = os.path.abspath("../yolov3_weights/yolov3_170000.weights")
 		self.darknetData = os.path.abspath("../yolov3TrainingSrc/obj.data")
 
 		# darknet.py
-		self.darknetDir = '/home/louisme/library/darknet/'
+		self.darknetDir = '/home/aart/library/darknet/'
 
 		# obj.data
 		self.arr = dict.fromkeys(
