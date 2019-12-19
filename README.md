@@ -2,10 +2,12 @@
 [![Build Status](https://travis-ci.com/ambersun1234/AART.svg?token=e57vJgMEsZsXRodR9BkR&branch=master)](https://travis-ci.com/ambersun1234/AART)
 [![License](https://img.shields.io/badge/License-aart-lightgray)](./LICENSE)
 
-**AART** represents the athlete posture identification and tracking on video and webcam.
+**AART** represents the real time athlete posture identification and tracking on video and webcam.
 
 ### Features
-+ Real time athlete analysis
++ Real time athlete posture analysis
++ Real time athlete data analysis(e.g. shooting rate)
++ Real time athlete tracking system
 + User-friendly GUI interface
 + Auto-save sports competition highlight
 + Providing language system( Traditional Chinese , English )
@@ -20,7 +22,7 @@ git clone https://github.com/ambersun1234/AART.git
 make aart
 ```
 
-### i18N
+### i18n
 + AART provide i18n language system, see the [documentation](./AART_project/src/gettextDocument.md) for detail
 
 ### System requirements
@@ -53,4 +55,4 @@ autopep8 --in-place --global-config ~/.config/pep8 AART_project/src/main.py
 + u10506151@ms.ttu.edu.tw
 
 ### License
-+ This project is licensed under other license - see the [Other License](./LICENSE) file for detail
++ This project is licensed under AART license - see the [AART License](./LICENSE) file for detail
