@@ -1,11 +1,11 @@
 dist: xenial
 language: python
 
-before_install:
-  - npm install -g pyright
-
 install:
-  - find $TRAVIS_BUILD_DIR/ -type f -name "*.py" -exec pyright --dependencies cv2 OpenPose {} \;
+  - pip3 install pycodestyle
+  
+script:
+  - python3 $TRAVIS_BUILD_DIR/scripts/pre-commit.hook
 
 notifications:
   email:
