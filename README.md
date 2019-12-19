@@ -17,11 +17,6 @@
 git clone https://github.com/ambersun1234/AART.git
 ```
 
-### System requirements
-+ `Ubuntu 16.04 LTS`
-+ Nvidia `GTX 1070` up( or `VRAM 8G` up )
-+ see [system documentation]() file for detail
-
 ### Running
 ```=1
 make aart
