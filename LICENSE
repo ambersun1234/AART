@@ -1,0 +1,28 @@
+AART License
+
+Copyright (c) 2019 ambersun(ambersun1019.shawn@gmail.com)
+Copyright (c) 2019 louisme87(u10506122@ms.ttu.edu.tw)
+
+By using or downloading this software, you agree to the following terms of use. If you don't agree with the following, you may not use or download the software. These license terms are set by your academic institution or non-profit organization or company(called "Licensee" or "You" in this agreement) and AART development team(called "Licensor" or "We" in this agreement).
+
+1. Use Restrictions
+The software is for academic or non-profit use only, and you may not sell, distribute, redistribute, lease, sublicense to a third party of use, unless the licensor expressly agrees.
+
+2. Ownership
+All third-party packages used in this software are owned by the third-party software creator. For OpenCV, OpenPose and wxPython, licensor didn't change any part of the source code in any possible way, we only use the API's that package owner provided for this software development. Therefore, licensor only has the ownership of code except for the third-party software.
+
+3. Derivatives
+You may modify part of code of the software(i.e. the part owned by the licensor) to create a derivative; However, you agree that the modification or derivative may only be used in academic or non-profit research usage; unless the licensor has the explicit consent,  modifications for profit behavior will violate this license
+
+4. Termination of authorization
+If you violate any of the terms of this license, this license will automatically terminate without notice. You can terminate this agreement by stopping the use of the software from the time you download or use the software until the end the terms with this license. 
+For the terminated agreement, you must delete any backups of the software, including third-party software. If you violate the license of any third-party software license, you agree that everything has nothing to do with the licensor, and you are willing to bear any consequences.
+
+5. Fee
+The licensor will not charge you any fees if you follow all of the terms of use.
+
+6. Disclaimer of Warranties
+The software is provided "as-is" without warranty of any kind including any warranties of performance of merchantability or fitness for a particular use or purpose or of non-infreingement. Licensee bears all risk relating to quality and performance of the software and related materials.
+
+7. Support and Maintenance
+No Software supports or training by the Licensor is provided as part of this Agreement.

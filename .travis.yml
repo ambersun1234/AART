@@ -1,0 +1,15 @@
+dist: xenial
+language: python
+
+install:
+  - pip3 install pycodestyle
+  
+script:
+  - python3 $TRAVIS_BUILD_DIR/scripts/pre-commit.hook
+
+notifications:
+  email:
+    recipients:
+      ambersun1019.shawn@gmail.com
+    on_success: never
+    on_failure: always

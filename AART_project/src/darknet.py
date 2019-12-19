@@ -1,12 +1,11 @@
 from ctypes import *
-import math
 import random
 import numpy as np
 
-from src.config.yoloConfig import *
+import math
+from config.yoloConfig import number, number20
+# AART_project/src/config
 # 導入各自機器的檔案路徑
-
-myHomeDir = darknetDir
 
 def sample(probs):
 	s = sum(probs)
@@ -60,8 +59,16 @@ class METADATA(Structure):
 		("names", POINTER(c_char_p))
 	]
 
+darknet = number()
+# darknet = number20()
 
-config()  # function from yoloConfig
+darknet.config()
+defaultModelFolder = darknet.defaultModelFolder
+darknetCfg = darknet.darknetCfg
+darnetWeights = darknet.darnetWeights
+darknetData = darknet.darknetData
+
+myHomeDir = darknet.darknetDir
 lib = CDLL(myHomeDir + "libdarknet.so", RTLD_GLOBAL)
 lib.network_width.argtypes = [c_void_p]
 lib.network_width.restype = c_int

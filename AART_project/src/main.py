@@ -3,13 +3,13 @@ import wx.media
 import sys
 import os
 
-from src.device.device import SelectDeviceDialog
-from src.input.input import InputPanel
-from src.media.media import MediaPanel
-from src.output.output import OutputTextPanel, OutputPicPanel
-from src.welcome.welcome import WelcomeGuide
-from src.config.configJSON import Config
-from src.neuralNetwork.prediction import runNeuralNetwork
+from device.device import SelectDeviceDialog
+from input.input import InputPanel
+from media.media import MediaPanel
+from output.output import OutputTextPanel, OutputPicPanel
+from welcome.welcome import WelcomeGuide
+from config.configJSON import Config
+from neuralNetwork.prediction import runNeuralNetwork
 
 import gc
 
@@ -254,6 +254,6 @@ if __name__ == '__main__':
 	global defaultPath
 	defaultPath = os.getcwd()
 
-	app = wx.App()
+	app = wx.App(False)
 	frame = Frame(None)
 	app.MainLoop()

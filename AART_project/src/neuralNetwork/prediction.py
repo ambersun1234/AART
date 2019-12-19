@@ -5,9 +5,10 @@ import tensorflow as tf
 import sys
 import os
 import cv2
-from sklearn import metrics
+import math
 
-from src.darknet import *
+from darknet import *
+from config.yoloConfig import *
 
 try:
     sys.path.append('/usr/local/python')
@@ -37,9 +38,11 @@ class runNeuralNetwork:
         self.meta = load_meta(darknetData.encode('utf-8'))
         self.keypointHistory = dict()
         self.shootingCount = 1
-        self.layupCount = 1
         self.dribbleCount = 1
         self.saveVideo = dict()
+        self.frameCount = 0
+        self.shootPerson = None
+        self.shootRate = dict()
 
         # input temp, modify by panels
         self._idict = None
@@ -74,13 +77,14 @@ class runNeuralNetwork:
             self.y_LSTM = y
 
     def trackNum(self, specific, specific_num, frame):
+        self.frameCount += 1
         result = detect(self.net, self.meta, frame)
         self.datum.cvInputData = frame
         keypoints = self.datum.poseKeypoints
         self.opWrapper.emplaceAndPop([self.datum])
         try:
             lala = len(keypoints)
-        except:
+        except BaseException as e:
             return
 
         self.outputFrame = self.datum.cvOutputData
@@ -91,13 +95,75 @@ class runNeuralNetwork:
             for key in specific_num:
                 numberTmp.append(specific_num[key])
 
+        handBallDist = []
+        ballX, ballY, ballW, ballH = 0, 0, 0, 0
+        ballXMin, ballYMin, ballXMax, ballYMax = 0, 0, 0, 0
+        hoopX, hoopY, hoopW, hoopH = 0, 0, 0, 0
+        hoopXMin, hoopYMin, hoopXMax, hoopYMax = 0, 0, 0, 0
+        for row in result:
+            if row[0].decode() == 'ball':
+                ballX, ballY, ballW, ballH = \
+                    row[2][0], row[2][1], row[2][2], row[2][3]
+                ballXMin, ballYMin, ballXMax, ballYMax = self.convertBack(
+                    float(ballX),
+                    float(ballY),
+                    float(ballW),
+                    float(ballH)
+                )
+            elif row[0].decode() == 'hoop':
+                hoopX, hoopY, hoopW, hoopH = \
+                    row[2][0], row[2][1], row[2][2], row[2][3]
+                hoopXMin, hoopYMin, hoopXMax, hoopYMax = self.convertBack(
+                    float(hoopX),
+                    float(hoopY),
+                    float(hoopW),
+                    float(hoopH)
+                )
+
+        for j in range(len(keypoints)):
+            if keypoints[j][4][2] != 0 or keypoints[j][7][2] != 0:
+                handBallDist.append(
+                    [self.handBallDistCul(ballX, ballY, keypoints[j]), j]
+                )
+        handBallDist.sort()
+
+        # shootPerson = [A, B]
+        # A為投籃的球員號碼
+        # B為抓到投籃時的frame為多少
+        # shootRate[C] = [D, E]
+        # C為球員號碼
+        # D為投球數量
+        # E為進球數量
+        if self.shootPerson is not None and\
+            self.shootPerson[1] - self.frameCount < 30:
+            overlap = self.overlap(ballXMin, ballYMin, ballXMax, ballYMax,
+                                hoopXMin, hoopYMin, hoopXMax, hoopYMax)
+            if overlap > 0.7:
+                if self.shootRate.get(self.shootPerson[0], None) is not None:
+                    tmp = self.shootRate[self.shootPerson[0]]
+                    self.shootRate[self.shootPerson[0]] =
+                    [tmp[0] + 1, tmp[1] + 1]
+                else:
+                    self.shootRate[self.shootPerson[0]] = [1, 1]
+        elif self.shootPerson is not None and\
+            self.shootPerson[1] - self.frameCount >= 30:
+            if self.shootRate.get(self.shootPerson[0], None) is not None:
+                tmp = self.shootRate[self.shootPerson[0]]
+                self.shootRate[self.shootPerson[0]] = [tmp[0] + 1, tmp[1]]
+            else:
+                self.shootRate[self.shootPerson[0]] = [1, 0]
+                self.shootPerson = None
+
         for i in result:
             # Judge whether the person is who we want
             if specific == 1:
-                if i[0].decode() not in numberTmp:
+                if i[0].decode() not in numberTmp or \
+                    not i[0].decode().isdigit():
                     continue
+            elif not i[0].decode().isdigit():
+                continue
+
             num = i[0].decode()
-            personNum = 'person{}'.format(num)
 
             x, y, w, h = i[2][0], i[2][1], i[2][2], i[2][3]
             xmin, ymin, xmax, ymax = self.convertBack(
@@ -106,85 +172,59 @@ class runNeuralNetwork:
                 float(w),
                 float(h)
             )
+            if num == '4':
+                color = self.testColor(frame[ymin:ymax, xmin:xmax].copy())
+                num = num + color
+                personNum = 'person{}{}'.format(num, color)
+            else:
+                personNum = 'person{}'.format(num)
+
             for j in range(len(keypoints)):
                 if keypoints[j][1][2] != 0 and \
                         x - 50 <= keypoints[j][1][0] <= x + 50 \
-                        and ymin - 50 <= keypoints[j][1][1] <= ymin + 50:
+                        and y - 50 <= keypoints[j][1][1] <= y + 50:
                     normalizedPoint, poseture = self.normalize(keypoints[j])
                     retFrame[str(num)] = poseture
-                    # Save the keypoints to the txt for LSTM detect
+
+                if keypoints[j][1][2] != 0 and \
+                        x - 50 <= keypoints[j][1][0] <= x + 50 \
+                        and y - 50 <= keypoints[j][1][1] <= y + 50\
+                        and j == handBallDist[0][1]\
+                        and handBallDist[0][0] < 100:
+                    # Save the keypoints to the list for LSTM detect
                     if personNum not in self.keypointHistory:
+                        lines = 0
                         self.keypointHistory[personNum] = [[]]
                         self.saveVideo[personNum] = [frame]
-                        for pointNum in range(len(normalizedPoint)):
-                            if 8 >= pointNum >= 1 or \
-                                    11 >= pointNum >= 10 or \
-                                    14 >= pointNum >= 13:
-                                self.keypointHistory[personNum][0].append(
-                                    normalizedPoint[pointNum][0]
-                                )
-                                self.keypointHistory[personNum][0].append(
-                                    normalizedPoint[pointNum][1]
-                                )
                     else:
                         lines = len(self.keypointHistory[personNum])
-                        if lines < 61:
-                            self.keypointHistory[personNum].append([])
-                            self.saveVideo[personNum].append(frame)
-                            for pointNum in range(len(normalizedPoint)):
-                                if 8 >= pointNum >= 1 or \
-                                        11 >= pointNum >= 10 or \
-                                        14 >= pointNum >= 13:
-                                    self.keypointHistory[
-                                        personNum
-                                    ][
-                                        lines
-                                    ].append(
-                                        normalizedPoint[pointNum][0]
-                                    )
-                                    self.keypointHistory[
-                                        personNum
-                                    ][
-                                        lines
-                                    ].append(
-                                        normalizedPoint[pointNum][1]
-                                    )
-                        else:
-                            lstmPrediction = self.recognizeLSTM(
-                                self.keypointHistory[personNum]
+                        self.keypointHistory[personNum].append([])
+                        self.saveVideo[personNum].append(frame)
+
+                    for pointNum in range(len(normalizedPoint)):
+                        # 擷取所需骨架
+                        if 8 >= pointNum >= 1 or \
+                                11 >= pointNum >= 10 or \
+                                14 >= pointNum >= 13:
+                            self.keypointHistory[personNum][lines].append(
+                                normalizedPoint[pointNum][0]
                             )
-                            if lstmPrediction != 'none':
-                                retLSTM[num] = lstmPrediction
-                                self.keypointHistory.pop(personNum, None)
-                                self.writeVideo(personNum, lstmPrediction)
-                                self.saveVideo[personNum].clear()
-                                continue
-                            tmp = self.keypointHistory[personNum][1:]
-                            lines = 60
-                            self.keypointHistory[personNum] = tmp
-                            self.keypointHistory[personNum].append([])
-                            del self.saveVideo[personNum][0]
-                            self.saveVideo[personNum].append(frame)
-                            for pointNum in range(len(normalizedPoint)):
-                                if 8 >= pointNum >= 1 or \
-                                        11 >= pointNum >= 10 or \
-                                        14 >= pointNum >= 13:
-                                    self.keypointHistory[
-                                        personNum
-                                    ][
-                                        lines
-                                    ].append(
-                                        normalizedPoint[pointNum][0]
-                                    )
-                                    self.keypointHistory[
-                                        personNum
-                                    ][
-                                        lines
-                                    ].append(
-                                        normalizedPoint[pointNum][1]
-                                    )
+                            self.keypointHistory[personNum][lines].append(
+                                normalizedPoint[pointNum][1]
+                            )
+                    lstmPrediction = self.recognizeLSTM(
+                        self.keypointHistory[personNum]
+                    )
+                    # print(lstmPrediction)
+                    if lstmPrediction != 'none':
+                        if lstmPrediction == 'shooting':
+                            self.shootPerson = [num, self.frameCount]
+                        retLSTM[num] = lstmPrediction
+                        self.keypointHistory.pop(personNum, None)
+                        self.writeVideo(personNum, lstmPrediction)
+                        self.saveVideo[personNum].clear()
         self._odict = retLSTM
-        self._oimg = retFrame
+        self._oimg = retFrame  # h=204, w=164
 
     # Calculate the yolov3 return value to rectangle of the number
     def convertBack(self, x, y, w, h):
@@ -224,26 +264,35 @@ class runNeuralNetwork:
 
             count += 1
 
-        minY = minY - 5 if minY - 5 > 0 else 0
-        maxY = maxY + 5 if maxY + 5 < height else height - 1
-        minX = minX - 5 if minX - 5 > 0 else 0
-        maxX = maxX + 5 if maxX + 5 < width else width - 1
+        # minY = minY - 5 if minY - 5 > 0 else 0
+        # maxY = maxY + 5 if maxY + 5 < height else height - 1
+        # minX = minX - 5 if minX - 5 > 0 else 0
+        # maxX = maxX + 5 if maxX + 5 < width else width - 1
 
         # Make output specific person picture beautiful
-        frameOutMinY = minY
-        frameOutMaxY = maxY
-        if keypoints[1][2] != 0 and keypoints[8][2] != 0:
-            minYTmp = int(
-                keypoints[1][1] - (keypoints[8][1] - keypoints[1][1])
-            )
-            maxYTmp = int(
-                keypoints[8][1] + (keypoints[8][1] - keypoints[1][1])
-            )
-            maxYTmp *= 5
-            frameOutMinY = minYTmp if minYTmp > 0 else 0
-            frameOutMaxY = maxYTmp if maxYTmp < height else height - 1
+        # frameOutMinY = minY
+        # frameOutMaxY = maxY
+        # if keypoints[1][2] != 0 and keypoints[8][2] != 0:
+        #     minYTmp = int(
+        #         keypoints[1][1] - (keypoints[8][1] - keypoints[1][1])
+        #     )
+        #     maxYTmp = int(
+        #         keypoints[8][1] + (keypoints[8][1] - keypoints[1][1])
+        #     )
+        #     maxYTmp *= 5
+        #     frameOutMinY = minYTmp if minYTmp > 0 else 0
+        #     frameOutMaxY = maxYTmp if maxYTmp < height else height - 1
+        outH = 204
+        outW = 164
+        plusH = math.floor((outH - (maxY - minY)) / 2)
+        plusW = math.floor((outW - (maxX - minX)) / 2)
+        minY = minY - plusH if minY - plusH > 0 else 0
+        maxY = maxY + plusH if maxY + plusH < height else height - 1
+        minX = minX - plusW if minX - plusW > 0 else 0
+        maxX = maxX + plusW if maxX + plusW < width else width - 1
 
-        frame = self.outputFrame[frameOutMinY:frameOutMaxY, minX:maxX].copy()
+        # print(frameOutMaxY - frameOutMinY)
+        frame = self.outputFrame[minY:maxY, minX:maxX].copy()
 
         ret = ret.astype(int)
         extractHeight = maxY - minY
@@ -290,7 +339,7 @@ class runNeuralNetwork:
                    'feetL_x', 'feetL_y']
         df = DataFrame(data=list, columns=columns)
 
-        time_steps = 60
+        time_steps = 10
         # 50 data for one input
         n_features = 24
         segments = []
@@ -341,19 +390,16 @@ class runNeuralNetwork:
                 self.inputLSTM: reshaped_segments
             }
         )
-        prediction = prediction[0]
-        if prediction[0] >= prediction[1] and \
-                prediction[0] >= prediction[2] and \
-                prediction[0] > 0.7:
-            prediction = 'dribbling'
-        elif prediction[1] >= prediction[0] and \
-                prediction[1] >= prediction[2] and \
-                prediction[1] > 0.7:
-            prediction = 'layup'
-        elif prediction[2] >= prediction[0] and \
-                prediction[2] >= prediction[1] and \
-                prediction[2] > 0.7:
-            prediction = 'shooting'
+        if len(prediction) > 0:
+            prediction = prediction[0]
+            if prediction[0] >= prediction[1] and \
+                    prediction[0] > 0.7:
+                prediction = 'dribbling'
+            elif prediction[1] >= prediction[0] and \
+                    prediction[1] > 0.7:
+                prediction = 'shooting'
+            else:
+                prediction = 'none'
         else:
             prediction = 'none'
 
@@ -367,9 +413,6 @@ class runNeuralNetwork:
         if activity == 'dribbling':
             count = self.dribbleCount
             self.dribbleCount += 1
-        elif activity == 'layup':
-            count = self.layupCount
-            self.layupCount += 1
         else:
             count = self.shootingCount
             self.shootingCount += 1
@@ -391,5 +434,62 @@ class runNeuralNetwork:
             size
         )
         for frame in self.saveVideo[personNum]:
+
             videoWriter.write(frame)
         videoWriter.release()
+
+    def handBallDistCul(self, x, y, keypoint):
+        ret = 1000000
+        if keypoint[4][2] != 0:
+            rightDist = math.sqrt(pow(x - keypoint[4][0], 2)
+                        + pow(y - keypoint[4][1], 2))
+        else:
+            rightDist = -1
+        if keypoint[7][2] != 0:
+            leftDist = math.sqrt(pow(x - keypoint[7][0], 2)
+                        + pow(y - keypoint[7][1], 2))
+        else:
+            leftDist = -1
+
+        if rightDist != -1 and rightDist < ret:
+            ret = rightDist
+        if leftDist != -1 and leftDist < ret:
+            ret = leftDist
+        return ret
+
+    def overlap(self, leftTopX1, leftTopY1, rightBottomX1, rightBottomY1,
+                      leftTopX2, leftTopY2, rightBottomX2, rightBottomY2):
+        x0 = max(leftTopX1, leftTopX2)
+        x1 = min(rightBottomX1, rightBottomX2)
+        y0 = max(leftTopY1, leftTopY2)
+        y1 = min(rightBottomY1, rightBottomY2)
+        if x0 >= x1 or y0 >= y1:
+            return 0.0
+        areaInt = (x1 - x0) * (y1 - y0)
+        return areaInt / ((rightBottomX1 - leftTopX1)
+                * (rightBottomY1 - leftTopY1) + (rightBottomX2 - leftTopX2)
+                * (rightBottomY2 - leftTopY2) - areaInt)
+
+    def testColor(self, frame):
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        lower_blue = np.array([78, 43, 46])
+        upper_blue = np.array([110, 255, 255])
+        lower_yellow = np.array([10, 50, 50])
+        upper_yellow = np.array([30, 255, 255])
+        mask_blue = cv2.inRange(hsv, lower_blue, upper_blue)
+        blue_count = 0
+        mask_yellow = cv2.inRange(hsv, lower_yellow, upper_yellow)
+        yellow_count = 0
+        h, w = mask_blue.shape
+        # cv2.imshow('test', mask_blue)
+        for i in range(h):
+            x = mask_blue[i, int(w / 2)]
+            if x == 255:
+                blue_count += 1
+            x = mask_yellow[i, int(w / 2)]
+            if x == 255:
+                yellow_count += 1
+        if blue_count > yellow_count:
+            return 'B'
+        else:
+            return 'Y'

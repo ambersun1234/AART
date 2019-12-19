@@ -10,7 +10,7 @@ from config import *
 
 sys.path.append('/usr/local/python/openpose')
 
-config()
+config(0)
 
 try:
     from openpose import *
