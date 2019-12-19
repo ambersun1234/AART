@@ -173,10 +173,7 @@ class runNeuralNetwork:
             )
             if num == '4':
                 color = self.testColor(frame[ymin:ymax, xmin:xmax].copy())
-                if color == 'Y':
-                    num = '444'
-                else:
-                    num = '433'
+                num = num + color
                 personNum = 'person{}{}'.format(num, color)
             else:
                 personNum = 'person{}'.format(num)
