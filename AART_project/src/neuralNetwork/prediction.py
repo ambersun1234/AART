@@ -182,14 +182,17 @@ class runNeuralNetwork:
                 personNum = 'person{}'.format(num)
 
             for j in range(len(keypoints)):
+                if keypoints[j][1][2] != 0 and \
+                        x - 50 <= keypoints[j][1][0] <= x + 50 \
+                        and y - 50 <= keypoints[j][1][1] <= y + 50:
+                    normalizedPoint, poseture = self.normalize(keypoints[j])
+                    retFrame[str(num)] = poseture
 
                 if keypoints[j][1][2] != 0 and \
                         x - 50 <= keypoints[j][1][0] <= x + 50 \
                         and y - 50 <= keypoints[j][1][1] <= y + 50\
                         and j == handBallDist[0][1]\
                         and handBallDist[0][0] < 100:
-                    normalizedPoint, poseture = self.normalize(keypoints[j])
-                    retFrame[str(num)] = poseture
                     # Save the keypoints to the list for LSTM detect
                     if personNum not in self.keypointHistory:
                         lines = 0
@@ -223,7 +226,7 @@ class runNeuralNetwork:
                         self.writeVideo(personNum, lstmPrediction)
                         self.saveVideo[personNum].clear()
         self._odict = retLSTM
-        self._oimg = retFrame
+        self._oimg = retFrame  # h=204, w=164
 
     # Calculate the yolov3 return value to rectangle of the number
     def convertBack(self, x, y, w, h):
@@ -263,26 +266,35 @@ class runNeuralNetwork:
 
             count += 1
 
-        minY = minY - 5 if minY - 5 > 0 else 0
-        maxY = maxY + 5 if maxY + 5 < height else height - 1
-        minX = minX - 5 if minX - 5 > 0 else 0
-        maxX = maxX + 5 if maxX + 5 < width else width - 1
+        # minY = minY - 5 if minY - 5 > 0 else 0
+        # maxY = maxY + 5 if maxY + 5 < height else height - 1
+        # minX = minX - 5 if minX - 5 > 0 else 0
+        # maxX = maxX + 5 if maxX + 5 < width else width - 1
 
         # Make output specific person picture beautiful
-        frameOutMinY = minY
-        frameOutMaxY = maxY
-        if keypoints[1][2] != 0 and keypoints[8][2] != 0:
-            minYTmp = int(
-                keypoints[1][1] - (keypoints[8][1] - keypoints[1][1])
-            )
-            maxYTmp = int(
-                keypoints[8][1] + (keypoints[8][1] - keypoints[1][1])
-            )
-            maxYTmp *= 5
-            frameOutMinY = minYTmp if minYTmp > 0 else 0
-            frameOutMaxY = maxYTmp if maxYTmp < height else height - 1
+        # frameOutMinY = minY
+        # frameOutMaxY = maxY
+        # if keypoints[1][2] != 0 and keypoints[8][2] != 0:
+        #     minYTmp = int(
+        #         keypoints[1][1] - (keypoints[8][1] - keypoints[1][1])
+        #     )
+        #     maxYTmp = int(
+        #         keypoints[8][1] + (keypoints[8][1] - keypoints[1][1])
+        #     )
+        #     maxYTmp *= 5
+        #     frameOutMinY = minYTmp if minYTmp > 0 else 0
+        #     frameOutMaxY = maxYTmp if maxYTmp < height else height - 1
+        outH = 204
+        outW = 164
+        plusH = math.floor((outH - (maxY - minY)) / 2)
+        plusW = math.floor((outW - (maxX - minX)) / 2)
+        minY = minY - plusH if minY - plusH > 0 else 0
+        maxY = maxY + plusH if maxY + plusH < height else height - 1
+        minX = minX - plusW if minX - plusW > 0 else 0
+        maxX = maxX + plusW if maxX + plusW < width else width - 1
 
-        frame = self.outputFrame[frameOutMinY:frameOutMaxY, minX:maxX].copy()
+        # print(frameOutMaxY - frameOutMinY)
+        frame = self.outputFrame[minY:maxY, minX:maxX].copy()
 
         ret = ret.astype(int)
         extractHeight = maxY - minY
@@ -380,7 +392,7 @@ class runNeuralNetwork:
                 self.inputLSTM: reshaped_segments
             }
         )
-        try:
+        if len(prediction) > 0:
             prediction = prediction[0]
             if prediction[0] >= prediction[1] and \
                     prediction[0] > 0.7:
@@ -390,7 +402,7 @@ class runNeuralNetwork:
                 prediction = 'shooting'
             else:
                 prediction = 'none'
-        except:
+        else:
             prediction = 'none'
 
         return prediction
@@ -471,13 +483,11 @@ class runNeuralNetwork:
         # cv2.imshow('test', mask_blue)
         for i in range(h):
             x = mask_blue[i, int(w/2)]
-            if x == 0:
+            if x == 255:
                 blue_count += 1
             x= mask_yellow[i, int(w/2)]
-            if x == 0:
+            if x == 255:
                 yellow_count += 1
-        blue_count = 0
-        yellow_count = 1
         if blue_count > yellow_count:
             return 'B'
         else:
