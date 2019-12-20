@@ -77,6 +77,8 @@ class runNeuralNetwork:
             self.y_LSTM = y
 
     def trackNum(self, specific, specific_num, frame):
+        print(self.shootRate)
+        print(self.shootPerson)
         self.frameCount += 1
         result = detect(self.net, self.meta, frame)
         self.datum.cvInputData = frame
@@ -133,8 +135,8 @@ class runNeuralNetwork:
         # C為球員號碼
         # D為投球數量
         # E為進球數量
-        if self.shootPerson is not None and\
-            self.shootPerson[1] - self.frameCount < 30:
+        if (self.shootPerson is not None) and\
+            (self.frameCount - self.shootPerson[1]) < 30:
             overlap = self.overlap(ballXMin, ballYMin, ballXMax, ballYMax,
                          hoopXMin, hoopYMin, hoopXMax, hoopYMax)
             if overlap > 0.7:
@@ -143,8 +145,8 @@ class runNeuralNetwork:
                     self.shootRate[self.shootPerson[0]] = [tmp[0]+1, tmp[1]+1]
                 else:
                     self.shootRate[self.shootPerson[0]] = [1, 1]
-        elif self.shootPerson is not None and\
-            self.shootPerson[1] - self.frameCount >= 30:
+        elif (self.shootPerson is not None) and\
+            (self.frameCount - self.shootPerson[1]) >= 30:
             if self.shootRate.get(self.shootPerson[0], None) != None:
                 tmp = self.shootRate[self.shootPerson[0]]
                 self.shootRate[self.shootPerson[0]] = [tmp[0]+1, tmp[1]]
@@ -174,9 +176,7 @@ class runNeuralNetwork:
             if num == '4':
                 color = self.testColor(frame[ymin:ymax, xmin:xmax].copy())
                 num = num + color
-                personNum = 'person{}{}'.format(num, color)
-            else:
-                personNum = 'person{}'.format(num)
+            personNum = 'person{}'.format(num)
 
             for j in range(len(keypoints)):
                 if keypoints[j][1][2] != 0 and \
@@ -263,10 +263,10 @@ class runNeuralNetwork:
 
             count += 1
 
-        # minY = minY - 5 if minY - 5 > 0 else 0
-        # maxY = maxY + 5 if maxY + 5 < height else height - 1
-        # minX = minX - 5 if minX - 5 > 0 else 0
-        # maxX = maxX + 5 if maxX + 5 < width else width - 1
+        minY = minY - 5 if minY - 5 > 0 else 0
+        maxY = maxY + 5 if maxY + 5 < height else height - 1
+        minX = minX - 5 if minX - 5 > 0 else 0
+        maxX = maxX + 5 if maxX + 5 < width else width - 1
 
         # Make output specific person picture beautiful
         # frameOutMinY = minY
@@ -285,13 +285,13 @@ class runNeuralNetwork:
         outW = 164
         plusH = math.floor((outH - (maxY - minY)) / 2)
         plusW = math.floor((outW - (maxX - minX)) / 2)
-        minY = minY - plusH if minY - plusH > 0 else 0
-        maxY = maxY + plusH if maxY + plusH < height else height - 1
-        minX = minX - plusW if minX - plusW > 0 else 0
-        maxX = maxX + plusW if maxX + plusW < width else width - 1
+        minYOut = minY - plusH if minY - plusH > 0 else 0
+        maxYOut = maxY + plusH if maxY + plusH < height else height - 1
+        minXOut = minX - plusW if minX - plusW > 0 else 0
+        maxXOut = maxX + plusW if maxX + plusW < width else width - 1
 
-        # print(frameOutMaxY - frameOutMinY)
-        frame = self.outputFrame[minY:maxY, minX:maxX].copy()
+
+        frame = self.outputFrame[minYOut:maxYOut, minXOut:maxXOut].copy()
 
         ret = ret.astype(int)
         extractHeight = maxY - minY

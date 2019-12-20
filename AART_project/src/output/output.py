@@ -41,7 +41,7 @@ class OutputTextPanel(wx.Panel):
 			od = collections.OrderedDict(
 				sorted(
 					self.nn._odict.items(),
-					key=lambda x: int(x[0])
+					key=lambda x: str(x[0])
 				)
 			)
 			self.spbox.Clear(True)
@@ -158,6 +158,7 @@ class OutputPicPanel(wx.Panel):
 		self.uh = math.floor(self.h * 0.1)
 		self.dh = math.floor(self.h * 0.65)
 
+
 		# dynamically get image from LSTM
 		self.fps = 10
 		self.timer = wx.Timer(self)
@@ -183,7 +184,7 @@ class OutputPicPanel(wx.Panel):
 			od = collections.OrderedDict(
 				sorted(
 					self.nn._oimg.items(),
-					key=lambda x: int(x[0])
+					key=lambda x: str(x[0])
 				)
 			)
 			self.spbox.Clear(True)
