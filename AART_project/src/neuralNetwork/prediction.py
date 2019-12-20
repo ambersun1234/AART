@@ -77,8 +77,6 @@ class runNeuralNetwork:
             self.y_LSTM = y
 
     def trackNum(self, specific, specific_num, frame):
-        print(self.shootRate)
-        print(self.shootPerson)
         self.frameCount += 1
         result = detect(self.net, self.meta, frame)
         self.datum.cvInputData = frame
@@ -420,7 +418,7 @@ class runNeuralNetwork:
         pathSave = os.path.join(
             pathSave,
             'video_save',
-            '{}{}-{}.mp4'.format(
+            '{}{}-{}.avi'.format(
                 activity,
                 str(count),
                 personNum
@@ -430,7 +428,7 @@ class runNeuralNetwork:
         size = (width, height)
         videoWriter = cv2.VideoWriter(
             pathSave,
-            cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'),
+            cv2.VideoWriter_fourcc(*"XVID"),
             30,
             size
         )
