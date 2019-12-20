@@ -156,16 +156,7 @@ class runNeuralNetwork:
 
 
         for i in result:
-            # Judge whether the person is who we want
-            if specific == 1:
-                if i[0].decode() not in numberTmp or\
-                    not i[0].decode().isdigit():
-                    continue
-            elif not i[0].decode().isdigit():
-                continue
-
             num = i[0].decode()
-
             x, y, w, h = i[2][0], i[2][1], i[2][2], i[2][3]
             xmin, ymin, xmax, ymax = self.convertBack(
                 float(x),
@@ -177,6 +168,13 @@ class runNeuralNetwork:
                 color = self.testColor(frame[ymin:ymax, xmin:xmax].copy())
                 num = num + color
             personNum = 'person{}'.format(num)
+            # Judge whether the person is who we want
+            if specific == 1:
+                if (num not in numberTmp) or\
+                    not i[0].decode().isdigit():
+                    continue
+            elif not i[0].decode().isdigit():
+                continue
 
             for j in range(len(keypoints)):
                 if keypoints[j][1][2] != 0 and \
