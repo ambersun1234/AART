@@ -166,6 +166,10 @@ msgstr ""
 msgid "out"
 msgstr ""
 
+#: AART_project/src/output/output.py:107 AART_project/src/output/output.py:9
+msgid "rate"
+msgstr ""
+
 #: AART_project/src/output/output.py:64
 msgid " Athlete action: "
 msgstr ""
@@ -185,4 +189,3 @@ msgstr ""
 #: AART_project/src/welcome/welcome.py:174
 msgid "Recent file"
 msgstr ""
-

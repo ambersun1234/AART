@@ -172,6 +172,10 @@ msgstr "前進"
 msgid "backward"
 msgstr "後退"
 
+#: AART_project/src/output/output.py:107 AART_project/src/output/output.py:9
+msgid "rate"
+msgstr "進球率"
+
 #: AART_project/src/output/output.py:56 AART_project/src/output/output.py:127
 msgid "out"
 msgstr "輸出"

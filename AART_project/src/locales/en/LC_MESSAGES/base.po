@@ -161,6 +161,10 @@ msgstr "forward"
 msgid "backward"
 msgstr "backward"
 
+#: AART_project/src/output/output.py:107 AART_project/src/output/output.py:9
+msgid "rate"
+msgstr "rate"
+
 #: AART_project/src/output/output.py:56 AART_project/src/output/output.py:127
 msgid "out"
 msgstr "out"
@@ -184,4 +188,3 @@ msgstr "File not found."
 #: AART_project/src/welcome/welcome.py:174
 msgid "Recent file"
 msgstr "Recent file"
-

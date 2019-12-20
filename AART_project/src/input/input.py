@@ -155,7 +155,7 @@ class InputPanel(wx.Panel):
 				self.nn._imode = 0
 
 	def inputCheck(self, input):
-		return str(input).isdigit()
+		return str(input)
 
 	def inputReinit(self):
 		self.input = dict()

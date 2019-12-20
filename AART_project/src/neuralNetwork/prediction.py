@@ -134,8 +134,8 @@ class runNeuralNetwork:
         # C為球員號碼
         # D為投球數量
         # E為進球數量
-        if self.shootPerson is not None and\
-            self.shootPerson[1] - self.frameCount < 30:
+        if (self.shootPerson is not None) and\
+            (self.frameCount - self.shootPerson[1]) < 30:
             overlap = self.overlap(ballXMin, ballYMin, ballXMax, ballYMax,
                                 hoopXMin, hoopYMin, hoopXMax, hoopYMax)
             if overlap > 0.7:
@@ -145,9 +145,9 @@ class runNeuralNetwork:
                     [tmp[0] + 1, tmp[1] + 1]
                 else:
                     self.shootRate[self.shootPerson[0]] = [1, 1]
-        elif self.shootPerson is not None and\
-            self.shootPerson[1] - self.frameCount >= 30:
-            if self.shootRate.get(self.shootPerson[0], None) is not None:
+        elif (self.shootPerson is not None) and\
+            (self.frameCount - self.shootPerson[1]) >= 30:
+            if self.shootRate.get(self.shootPerson[0], None) != None:
                 tmp = self.shootRate[self.shootPerson[0]]
                 self.shootRate[self.shootPerson[0]] = [tmp[0] + 1, tmp[1]]
             else:
@@ -155,16 +155,7 @@ class runNeuralNetwork:
                 self.shootPerson = None
 
         for i in result:
-            # Judge whether the person is who we want
-            if specific == 1:
-                if i[0].decode() not in numberTmp or \
-                    not i[0].decode().isdigit():
-                    continue
-            elif not i[0].decode().isdigit():
-                continue
-
             num = i[0].decode()
-
             x, y, w, h = i[2][0], i[2][1], i[2][2], i[2][3]
             xmin, ymin, xmax, ymax = self.convertBack(
                 float(x),
@@ -175,9 +166,14 @@ class runNeuralNetwork:
             if num == '4':
                 color = self.testColor(frame[ymin:ymax, xmin:xmax].copy())
                 num = num + color
-                personNum = 'person{}{}'.format(num, color)
-            else:
-                personNum = 'person{}'.format(num)
+            personNum = 'person{}'.format(num)
+            # Judge whether the person is who we want
+            if specific == 1:
+                if (num not in numberTmp) or\
+                    not i[0].decode().isdigit():
+                    continue
+            elif not i[0].decode().isdigit():
+                continue
 
             for j in range(len(keypoints)):
                 if keypoints[j][1][2] != 0 and \
@@ -264,10 +260,10 @@ class runNeuralNetwork:
 
             count += 1
 
-        # minY = minY - 5 if minY - 5 > 0 else 0
-        # maxY = maxY + 5 if maxY + 5 < height else height - 1
-        # minX = minX - 5 if minX - 5 > 0 else 0
-        # maxX = maxX + 5 if maxX + 5 < width else width - 1
+        minY = minY - 5 if minY - 5 > 0 else 0
+        maxY = maxY + 5 if maxY + 5 < height else height - 1
+        minX = minX - 5 if minX - 5 > 0 else 0
+        maxX = maxX + 5 if maxX + 5 < width else width - 1
 
         # Make output specific person picture beautiful
         # frameOutMinY = minY
@@ -286,13 +282,13 @@ class runNeuralNetwork:
         outW = 164
         plusH = math.floor((outH - (maxY - minY)) / 2)
         plusW = math.floor((outW - (maxX - minX)) / 2)
-        minY = minY - plusH if minY - plusH > 0 else 0
-        maxY = maxY + plusH if maxY + plusH < height else height - 1
-        minX = minX - plusW if minX - plusW > 0 else 0
-        maxX = maxX + plusW if maxX + plusW < width else width - 1
+        minYOut = minY - plusH if minY - plusH > 0 else 0
+        maxYOut = maxY + plusH if maxY + plusH < height else height - 1
+        minXOut = minX - plusW if minX - plusW > 0 else 0
+        maxXOut = maxX + plusW if maxX + plusW < width else width - 1
 
-        # print(frameOutMaxY - frameOutMinY)
-        frame = self.outputFrame[minY:maxY, minX:maxX].copy()
+
+        frame = self.outputFrame[minYOut:maxYOut, minXOut:maxXOut].copy()
 
         ret = ret.astype(int)
         extractHeight = maxY - minY
@@ -419,7 +415,7 @@ class runNeuralNetwork:
         pathSave = os.path.join(
             pathSave,
             'video_save',
-            '{}{}-{}.mp4'.format(
+            '{}{}-{}.avi'.format(
                 activity,
                 str(count),
                 personNum
@@ -429,7 +425,7 @@ class runNeuralNetwork:
         size = (width, height)
         videoWriter = cv2.VideoWriter(
             pathSave,
-            cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'),
+            cv2.VideoWriter_fourcc(*"XVID"),
             30,
             size
         )
