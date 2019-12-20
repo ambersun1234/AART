@@ -79,10 +79,18 @@ class OutputTextPanel(wx.Panel):
 					)
 				)
 
+				flag = True
+				# check shoot rate exists
+				outputtxt = "{}".format(
+					_(posture)
+				)
+				if self.nn.shootRate.get(number) is None:
+					flag = False
+
 				# text second part
 				text2 = wx.StaticText(
 					self.sp,
-					label="{}".format(_(posture))
+					label=outputtxt
 				)
 				text2.SetForegroundColour(self.config.loadedConfig["colorText"])
 				text2.SetFont(
@@ -94,11 +102,55 @@ class OutputTextPanel(wx.Panel):
 					)
 				)
 
+				if flag:
+					outputtxt = "{}: ".format(
+						_("rate")
+					)
+					outputtxt2 = "({}/{}, {}%)".format(
+						self.nn.shootRate[number][0],
+						self.nn.shootRate[number][1],
+						self.nn.shootRate[number][1] / self.nn.shootRate[number][0]
+					)
+					# text third part
+					text3 = wx.StaticText(
+						self.sp,
+						label=outputtxt
+					)
+					text3.SetForegroundColour(self.config.loadedConfig["colorText"])
+					text3.SetBackgroundColour("black")
+					text3.SetFont(
+						wx.Font(
+							self.config.loadedConfig["fontSize"],
+							family=wx.DEFAULT,
+							style=wx.NORMAL,
+							weight=wx.NORMAL
+						)
+					)
+
+					text4 = wx.StaticText(
+						self.sp,
+						label=outputtxt2
+					)
+					text4.SetForegroundColour(self.config.loadedConfig["colorText"])
+					text4.SetFont(
+						wx.Font(
+							self.config.loadedConfig["fontSize"],
+							family=wx.DEFAULT,
+							style=wx.NORMAL,
+							weight=wx.NORMAL
+						)
+					)
+
 				# hbox part
 				hbox.AddSpacer(20)
 				hbox.Add(text)
 				hbox.AddSpacer(5)
 				hbox.Add(text2)
+				if flag:
+					hbox.AddSpacer(5)
+					hbox.Add(text3)
+					hbox.AddSpacer(5)
+					hbox.Add(text4)
 
 				self.spbox.Add(hbox)
 
