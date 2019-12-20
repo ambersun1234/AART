@@ -104,7 +104,8 @@ class runNeuralNetwork:
         hoopXMin, hoopYMin, hoopXMax, hoopYMax = 0, 0, 0, 0
         for row in result:
             if row[0].decode() == 'ball':
-                ballX, ballY, ballW, ballH = row[2][0], row[2][1], row[2][2], row[2][3]
+                ballX, ballY, ballW, ballH =\
+                            row[2][0], row[2][1], row[2][2], row[2][3]
                 ballXMin, ballYMin, ballXMax, ballYMax = self.convertBack(
                     float(ballX),
                     float(ballY),
@@ -112,7 +113,8 @@ class runNeuralNetwork:
                     float(ballH)
                 )
             elif row[0].decode() == 'hoop':
-                hoopX, hoopY, hoopW, hoopH = row[2][0], row[2][1], row[2][2], row[2][3]
+                hoopX, hoopY, hoopW, hoopH =\
+                            row[2][0], row[2][1], row[2][2], row[2][3]
                 hoopXMin, hoopYMin, hoopXMax, hoopYMax = self.convertBack(
                     float(hoopX),
                     float(hoopY),
@@ -440,11 +442,13 @@ class runNeuralNetwork:
     def handBallDistCul(self, x, y, keypoint):
         ret = 1000000
         if keypoint[4][2] != 0:
-            rightDist = math.sqrt(pow(x - keypoint[4][0], 2) + pow(y - keypoint[4][1], 2))
+            rightDist = math.sqrt(pow(x - keypoint[4][0], 2) +\
+                                    pow(y - keypoint[4][1], 2))
         else:
             rightDist = -1
         if keypoint[7][2] != 0:
-            leftDist = math.sqrt(pow(x - keypoint[7][0], 2) + pow(y - keypoint[7][1], 2))
+            leftDist = math.sqrt(pow(x - keypoint[7][0], 2) +\
+                                    pow(y - keypoint[7][1], 2))
         else:
             leftDist = -1
 
@@ -464,7 +468,8 @@ class runNeuralNetwork:
             return 0.0
         areaInt = (x1 - x0) * (y1 - y0)
         return areaInt / ((rightBottomX1-leftTopX1)*(rightBottomY1-leftTopY1) +\
-                            (rightBottomX2-leftTopX2)*(rightBottomY2-leftTopY2) - areaInt)
+                            (rightBottomX2-leftTopX2)*(rightBottomY2-leftTopY2)\
+                                                                    - areaInt)
 
     def testColor(self, frame):
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)

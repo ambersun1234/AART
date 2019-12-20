@@ -35,6 +35,8 @@ def main():
 
         if not os.path.exists(filepath):
             os.makedirs(filepath)
+        if "AART_project/backupFile" in filename:
+            continue
         with open(filename, 'w') as f:
             system('git', 'show', ':' + name, stdout=f)
 

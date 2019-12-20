@@ -1,5 +1,0 @@
-classes=7
-train=/home/louisme/library/yolov3/AART_project/yolov3TrainingSrc/train.txt
-valid=/home/louisme/library/yolov3/AART_project/yolov3TrainingSrc/test.txt
-names=/home/louisme/library/yolov3/AART_project/yolov3TrainingSrc/obj.names
-backup=/home/louisme/library/yolov3/AART_project/yolov3_weights/yolov3_20000.weights

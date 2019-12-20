@@ -4,8 +4,16 @@ from PIL import Image
 import math
 import cv2
 import collections
+import re
 
 import gettext
+
+def atoi(text):
+	return int(text) if text.isdigit() else text
+
+	# natural sorting
+def nsort(text):
+	return [atoi(c) for c in re.split(r'(\d+)', text)]
 
 class OutputTextPanel(wx.Panel):
 	def __init__(self, parent, size, config, nn):
@@ -38,12 +46,12 @@ class OutputTextPanel(wx.Panel):
 
 	def onTimer(self, event):
 		if self.nn._odict:
-			od = collections.OrderedDict(
-				sorted(
+			od = {
+				k: v for k, v in sorted(
 					self.nn._odict.items(),
-					key=lambda x: str(x[0])
+					key=lambda x: nsort(x[0])
 				)
-			)
+			}
 			self.spbox.Clear(True)
 			check = True
 			for number, posture in od.items():
@@ -181,12 +189,12 @@ class OutputPicPanel(wx.Panel):
 	def onTimer(self, event):
 		offset = 40
 		if self.nn._oimg:
-			od = collections.OrderedDict(
-				sorted(
+			od = {
+				k: v for k, v in sorted(
 					self.nn._oimg.items(),
-					key=lambda x: str(x[0])
+					key=lambda x: nsort(x[0])
 				)
-			)
+			}
 			self.spbox.Clear(True)
 			posx = 0
 			for number, img in od.items():

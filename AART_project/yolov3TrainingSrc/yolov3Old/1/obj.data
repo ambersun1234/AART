@@ -1,5 +1,0 @@
-classes=22
-train=/meida/ambersun/gitRepo/yolov3/yolov3/src/train.txt
-valid=/meida/ambersun/gitRepo/yolov3/yolov3/src/test.txt
-names=/media/ambersun/gitRepo/yolov3/yolov3/src/obj.names
-backup=/media/ambersun/gitRepo/yolov3/yolov3/weights/
