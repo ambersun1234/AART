@@ -77,7 +77,7 @@ class runNeuralNetwork:
             self.inputLSTM = input
             self.y_LSTM = y
 
-    def resetVar():
+    def resetVar(self):
         del self.keypointHistory, self.saveVideo, self.shootPerson, self.shootRate
         gc.collect()
         self.keypointHistory = dict()
