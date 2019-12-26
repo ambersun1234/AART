@@ -108,9 +108,12 @@ class MediaFrame(wx.Panel):
 
 		if self.choice == self.type["video"] and \
 			self.mediaBar.slider.GetValue() == self.mediaBar.slider.GetMax():
-			self.timer.Stop()
 			self.mediaBar.controlButton.SetBitmap(self.mediaBar.playImg)
 			# which means the video play to the end and stop
+			# video read done, replay
+			self.mediaBar.controlButton.SetBitmap(self.mediaBar.pauseImg)
+			self.nn.resetVar()
+			self.contInit()
 
 		ret, frame = self.cap.read()
 
@@ -274,6 +277,19 @@ class MediaFrame(wx.Panel):
 					self.mediaBar.slider.GetValue() + self.fps * 5
 				)
 				self.cap.set(cv2.CAP_PROP_POS_FRAMES, self.mediaBar.slider.GetValue())
+
+	def contInit(self):
+		# reinitialize mediaFrame self variable
+		# this use in replay video only
+		self.fps = 30
+		self.cap = None
+		self.bmp = None
+
+		self.mediaBar.slider.SetMin(0)
+		self.mediaBar.slider.SetValue(0)
+		self.mediaBar.controlButton.SetBitmap(self.mediaBar.pauseImg)
+
+		self.load(self.videoPath, self.choice)
 
 	def reinit(self):
 		self.fps = 30

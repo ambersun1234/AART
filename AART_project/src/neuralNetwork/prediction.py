@@ -78,7 +78,10 @@ class runNeuralNetwork:
             self.y_LSTM = y
 
     def resetVar(self):
-        del self.keypointHistory, self.saveVideo, self.shootPerson, self.shootRate
+        del self.keypointHistory, \
+            self.saveVideo, \
+            self.shootPerson, \
+            self.shootRate
         gc.collect()
         self.keypointHistory = dict()
         self.shootingCount = 1
@@ -87,9 +90,9 @@ class runNeuralNetwork:
         self.frameCount = 0
         self.shootPerson = None
         self.shootRate = dict()
-        self._idict = None
-        self._iimg = None
-        self._imode = None
+        # self._idict = None
+        # self._iimg = None
+        # self._imode = None
         self._odict = None
         self._oimg = None
 
@@ -151,20 +154,21 @@ class runNeuralNetwork:
         # C為球員號碼
         # D為投球數量
         # E為進球數量
-        if (self.shootPerson is not None) and\
-            (self.frameCount - self.shootPerson[1]) < 30:
-            overlap = self.overlap(ballXMin, ballYMin, ballXMax, ballYMax,
-                                hoopXMin, hoopYMin, hoopXMax, hoopYMax)
+        if (self.shootPerson is not None) and \
+                (self.frameCount - self.shootPerson[1]) < 30:
+            overlap = self.overlap(
+                ballXMin, ballYMin, ballXMax, ballYMax,
+                hoopXMin, hoopYMin, hoopXMax, hoopYMax)
             if overlap > 0.7:
                 if self.shootRate.get(self.shootPerson[0], None) is not None:
                     tmp = self.shootRate[self.shootPerson[0]]
-                    self.shootRate[self.shootPerson[0]] =
-                    [tmp[0] + 1, tmp[1] + 1]
+                    self.shootRate[self.shootPerson[0]] = \
+                        [tmp[0] + 1, tmp[1] + 1]
                 else:
                     self.shootRate[self.shootPerson[0]] = [1, 1]
         elif (self.shootPerson is not None) and\
-            (self.frameCount - self.shootPerson[1]) >= 30:
-            if self.shootRate.get(self.shootPerson[0], None) != None:
+                (self.frameCount - self.shootPerson[1]) >= 30:
+            if self.shootRate.get(self.shootPerson[0], None) is not None:
                 tmp = self.shootRate[self.shootPerson[0]]
                 self.shootRate[self.shootPerson[0]] = [tmp[0] + 1, tmp[1]]
             else:
@@ -186,8 +190,8 @@ class runNeuralNetwork:
             personNum = 'person{}'.format(num)
             # Judge whether the person is who we want
             if specific == 1:
-                if (num not in numberTmp) or\
-                    not i[0].decode().isdigit():
+                if (num not in numberTmp) or \
+                        not i[0].decode().isdigit():
                     continue
             elif not i[0].decode().isdigit():
                 continue
@@ -303,7 +307,6 @@ class runNeuralNetwork:
         maxYOut = maxY + plusH if maxY + plusH < height else height - 1
         minXOut = minX - plusW if minX - plusW > 0 else 0
         maxXOut = maxX + plusW if maxX + plusW < width else width - 1
-
 
         frame = self.outputFrame[minYOut:maxYOut, minXOut:maxXOut].copy()
 
@@ -454,13 +457,13 @@ class runNeuralNetwork:
     def handBallDistCul(self, x, y, keypoint):
         ret = 1000000
         if keypoint[4][2] != 0:
-            rightDist = math.sqrt(pow(x - keypoint[4][0], 2)
-                        + pow(y - keypoint[4][1], 2))
+            rightDist = math.sqrt(pow(x - keypoint[4][0], 2) +
+                        pow(y - keypoint[4][1], 2))
         else:
             rightDist = -1
         if keypoint[7][2] != 0:
-            leftDist = math.sqrt(pow(x - keypoint[7][0], 2)
-                        + pow(y - keypoint[7][1], 2))
+            leftDist = math.sqrt(pow(x - keypoint[7][0], 2) +
+                        pow(y - keypoint[7][1], 2))
         else:
             leftDist = -1
 
@@ -471,7 +474,7 @@ class runNeuralNetwork:
         return ret
 
     def overlap(self, leftTopX1, leftTopY1, rightBottomX1, rightBottomY1,
-                      leftTopX2, leftTopY2, rightBottomX2, rightBottomY2):
+                leftTopX2, leftTopY2, rightBottomX2, rightBottomY2):
         x0 = max(leftTopX1, leftTopX2)
         x1 = min(rightBottomX1, rightBottomX2)
         y0 = max(leftTopY1, leftTopY2)
