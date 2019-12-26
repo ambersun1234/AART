@@ -6,6 +6,7 @@ import sys
 import os
 import cv2
 import math
+import gc
 
 from darknet import *
 from config.yoloConfig import *
@@ -75,6 +76,22 @@ class runNeuralNetwork:
             self.sessLSTM = sess
             self.inputLSTM = input
             self.y_LSTM = y
+
+    def resetVar():
+        del self.keypointHistory, self.saveVideo, self.shootPerson, self.shootRate
+        gc.collect()
+        self.keypointHistory = dict()
+        self.shootingCount = 1
+        self.dribbleCount = 1
+        self.saveVideo = dict()
+        self.frameCount = 0
+        self.shootPerson = None
+        self.shootRate = dict()
+        self._idict = None
+        self._iimg = None
+        self._imode = None
+        self._odict = None
+        self._oimg = None
 
     def trackNum(self, specific, specific_num, frame):
         self.frameCount += 1
