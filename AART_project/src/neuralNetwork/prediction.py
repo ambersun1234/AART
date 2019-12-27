@@ -97,6 +97,7 @@ class runNeuralNetwork:
         self._oimg = None
 
     def trackNum(self, specific, specific_num, frame):
+        print(self.shootRate)
         self.frameCount += 1
         result = detect(self.net, self.meta, frame)
         self.datum.cvInputData = frame
@@ -155,25 +156,26 @@ class runNeuralNetwork:
         # D為投球數量
         # E為進球數量
         if (self.shootPerson is not None) and \
-                (self.frameCount - self.shootPerson[1]) < 30:
+                (self.frameCount - self.shootPerson[1]) < 40:
             overlap = self.overlap(
                 ballXMin, ballYMin, ballXMax, ballYMax,
                 hoopXMin, hoopYMin, hoopXMax, hoopYMax)
-            if overlap > 0.7:
+            if overlap > 0.3:
                 if self.shootRate.get(self.shootPerson[0], None) is not None:
                     tmp = self.shootRate[self.shootPerson[0]]
                     self.shootRate[self.shootPerson[0]] = \
                         [tmp[0] + 1, tmp[1] + 1]
                 else:
                     self.shootRate[self.shootPerson[0]] = [1, 1]
+                self.shootPerson = None
         elif (self.shootPerson is not None) and\
-                (self.frameCount - self.shootPerson[1]) >= 30:
+                (self.frameCount - self.shootPerson[1]) >= 40:
             if self.shootRate.get(self.shootPerson[0], None) is not None:
                 tmp = self.shootRate[self.shootPerson[0]]
                 self.shootRate[self.shootPerson[0]] = [tmp[0] + 1, tmp[1]]
             else:
                 self.shootRate[self.shootPerson[0]] = [1, 0]
-                self.shootPerson = None
+            self.shootPerson = None
 
         for i in result:
             num = i[0].decode()
