@@ -3,9 +3,9 @@ import json
 
 import gettext
 
-class Config:
+class systemConfig:
 	def __init__(self, path):
-		self.path = "{}/config.json".format(os.path.dirname(path))
+		self.path = "{}/systemConfig.json".format(os.path.dirname(path))
 
 		temp = list()
 		self.loadedConfig = {

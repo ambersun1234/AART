@@ -1,14 +1,14 @@
 import wx
 import wx.media
-import sys
 import os
+import sys
 
 from device.device import SelectDeviceDialog
 from input.input import InputPanel
 from media.media import MediaPanel
 from output.output import OutputTextPanel, OutputPicPanel
 from welcome.welcome import WelcomeGuide
-from config.configJSON import Config
+from config.systemConfig import systemConfig
 from neuralNetwork.prediction import runNeuralNetwork
 
 import gc
@@ -24,8 +24,9 @@ class Frame(wx.Frame):
 		self.currentScreenX = 0
 		self.currentScreenY = 0
 		self.initSize()
+		self.rootPath = os.path.abspath(__file__)
 
-		self.config = Config(os.path.abspath(__file__))
+		self.config = systemConfig(self.rootPath)
 		self.nn = runNeuralNetwork()
 
 		# set language

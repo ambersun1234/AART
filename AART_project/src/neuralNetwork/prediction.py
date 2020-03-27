@@ -9,7 +9,7 @@ import math
 import gc
 
 from darknet import *
-from config.yoloConfig import *
+from config import devConfig
 
 try:
     sys.path.append('/usr/local/python')
@@ -24,7 +24,8 @@ except ImportError as e:
 class runNeuralNetwork:
     def __init__(self):
         params = dict()
-        params["model_folder"] = defaultModelFolder
+        devc = devConfig.devConfig()
+        params["model_folder"] = devc._ini_openpose_model
         opWrapper = openpose.WrapperPython()
         opWrapper.configure(params)
         opWrapper.start()
@@ -32,11 +33,11 @@ class runNeuralNetwork:
         self.opWrapper = opWrapper
         self.datum = datum
         self.net = load_net(
-            darknetCfg.encode('utf-8'),
-            darnetWeights.encode('utf-8'),
-            0
+			devc.extend["cfg"].encode('utf-8'),
+			devc.extend["weights"].encode('utf-8'),
+			0
         )
-        self.meta = load_meta(darknetData.encode('utf-8'))
+        self.meta = load_meta(devc.extend["data"].encode('utf-8'))
         self.keypointHistory = dict()
         self.shootingCount = 1
         self.dribbleCount = 1
@@ -97,7 +98,6 @@ class runNeuralNetwork:
         self._oimg = None
 
     def trackNum(self, specific, specific_num, frame):
-        print(self.shootRate)
         self.frameCount += 1
         result = detect(self.net, self.meta, frame)
         self.datum.cvInputData = frame
@@ -459,7 +459,7 @@ class runNeuralNetwork:
     def handBallDistCul(self, x, y, keypoint):
         ret = 1000000
         if keypoint[4][2] != 0:
-            rightDist = math.sqrt(pow(x - keypoint[4][0], 2) +
+            rightDist = math.sqrt(pow(x - keypoint[4][0], 2) + \
                         pow(y - keypoint[4][1], 2))
         else:
             rightDist = -1

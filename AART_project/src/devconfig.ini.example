@@ -1,0 +1,6 @@
+[darknet]
+srcLocation = /YOUR/PATH/TO/AART/AART_project/yolov3TrainingSrc
+runLocation = /YOUR/PATH/TO/DARKNET
+
+[openpose]
+modelLocation = /YOUR/PATH/TO/OPENPOSE/MODELS
