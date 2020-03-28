@@ -22,6 +22,9 @@ git clone https://github.com/ambersun1234/AART.git
 make aart
 ```
 
+## AART Neural Network Structure
++ ![](./AART_structure.jpg)
+
 ### i18n
 + AART provide i18n language system, see the [documentation](./AART_project/src/gettextDocument.md) for detail
 
