@@ -2,6 +2,8 @@
 [![Build Status](https://travis-ci.com/ambersun1234/AART.svg?token=e57vJgMEsZsXRodR9BkR&branch=master)](https://travis-ci.com/ambersun1234/AART)
 [![License](https://img.shields.io/badge/License-aart-lightgray)](./LICENSE)
 
+![](./aart.gif)
+
 **AART** represents the real time athlete posture identification and tracking on video and webcam.
 
 ### Features
